@@ -43,7 +43,7 @@ class ExternalWindow: UIWindow {
   
   var spaceController: SpaceController { _spCtrl }
   @objc var refWindow: UIWindow { _refWindow }
-  
+    
   init(windowScene: UIWindowScene, refWindow: UIWindow, spCtrl: SpaceController) {
     _refWindow = refWindow
     _spCtrl = spCtrl
@@ -79,6 +79,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   private var _ctrl = DummyVC()
   private var _lockCtrl: UIViewController? = nil
   private var _spCtrl = SpaceController()
+  
+  var universalUrlSshCommand: String?
   
   func sceneDidDisconnect(_ scene: UIScene) {
     if scene == ShadowWindow.shared?.refWindow.windowScene {
@@ -142,6 +144,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     window.rootViewController = _spCtrl
     window.isHidden = false
+    
+    guard let urlFromCommand = connectionOptions.urlContexts.first else { return }
+    
+    universalUrlSshCommand = getSshCommandFrom(url: urlFromCommand.url)
   }
   
   func sceneDidBecomeActive(_ scene: UIScene) {
@@ -260,6 +266,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
           KBTracker.shared.input?.reportFocus(true)
         }
       }
+      
+      // Called when the app has been killed previously
+      
+      guard let sshCommand = universalUrlSshCommand else { return }
+      
+      guard let term = _spCtrl.currentTerm() else {
+        return
+      }
+      
+      term.resumeIfNeeded()
+      term.view?.setNeedsLayout()
+      term.lineSubmitted(sshCommand)
+      
       return
     }
     
@@ -309,7 +328,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     guard let provisionalUrl = URLContexts.first else { return }
     
-    guard let urlComponents = URLComponents(url: provisionalUrl.url, resolvingAgainstBaseURL: false) else { return }
+    guard let sshCommand = getSshCommandFrom(url: provisionalUrl.url) else { return }
+    
+    guard let term = _spCtrl.currentTerm() else {
+      return
+    }
+    
+    term.resumeIfNeeded()
+    term.view?.setNeedsLayout()
+    term.lineSubmitted(sshCommand)
+    
+  }
+
+  func getSshCommandFrom(url: URL) -> String? {
+    
+    guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
     
     if let scheme = urlComponents.scheme {
       
@@ -327,25 +360,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
         
         // If no host is specified in the deep link URL don't do anythign, no host to SSH to
-        guard let host = urlComponents.host else { return }
+        guard let host = urlComponents.host else { return nil }
         
         provisionalCommand += host
         
         NSLog("Opened Universal Link, SSH-ing using this command \(provisionalCommand)")
-        
-        guard let term = _spCtrl.currentTerm() else {
-          return
-        }
-        
-        term.resumeIfNeeded()
-        term.view?.setNeedsLayout()
-        term.lineSubmitted(provisionalCommand)
+      
+        return provisionalCommand
         
       default:
         break
       }
     }
+    
+    return nil
   }
+  
   
   @objc var spaceController: SpaceController { _spCtrl }
 
