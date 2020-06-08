@@ -87,6 +87,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>blinkshell</string>
+				<string>ssh</string>
 			</array>
 		</dict>
 	</array>

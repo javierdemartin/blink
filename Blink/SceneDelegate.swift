@@ -305,6 +305,48 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     _ctrl.view.addSubview(_spCtrl.view)
   }
   
+  func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    
+    guard let provisionalUrl = URLContexts.first else { return }
+    
+    guard let urlComponents = URLComponents(url: provisionalUrl.url, resolvingAgainstBaseURL: false) else { return }
+    
+    if let scheme = urlComponents.scheme {
+      
+      switch scheme {
+      case "ssh":
+        
+        var provisionalCommand = "ssh "
+        
+        if let port = urlComponents.port {
+          provisionalCommand += " -p \(port) "
+        }
+        
+        if let user = urlComponents.user {
+          provisionalCommand += user + "@"
+        }
+        
+        // If no host is specified in the deep link URL don't do anythign, no host to SSH to
+        guard let host = urlComponents.host else { return }
+        
+        provisionalCommand += host
+        
+        NSLog("Opened Universal Link, SSH-ing using this command \(provisionalCommand)")
+        
+        guard let term = _spCtrl.currentTerm() else {
+          return
+        }
+        
+        term.resumeIfNeeded()
+        term.view?.setNeedsLayout()
+        term.lineSubmitted(provisionalCommand)
+        
+      default:
+        break
+      }
+    }
+  }
+  
   @objc var spaceController: SpaceController { _spCtrl }
 
 }
