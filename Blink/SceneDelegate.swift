@@ -275,6 +275,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return
       }
       
+//      spCtrl.newShellAction()
       term.resumeIfNeeded()
       term.view?.setNeedsLayout()
       term.lineSubmitted(sshCommand)
@@ -328,16 +329,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     guard let provisionalUrl = URLContexts.first else { return }
     
-    guard let sshCommand = getSshCommandFrom(url: provisionalUrl.url) else { return }
-    
-    guard let term = _spCtrl.currentTerm() else {
+    guard let window = window else {
       return
     }
     
-    term.resumeIfNeeded()
-    term.view?.setNeedsLayout()
-    term.lineSubmitted(sshCommand)
+    guard let sshCommand = getSshCommandFrom(url: provisionalUrl.url) else { return }
     
+    _spCtrl.newShellAction()
+    
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3) {
+
+      self._spCtrl.focusOnShellAction()
+      
+      guard let term = self._spCtrl.currentTerm() else {
+        return
+      }
+
+//      term.updateFocusIfNeeded()
+//      term.view?.setNeedsLayout()
+      term.lineSubmitted(sshCommand)
+    }
   }
 
   func getSshCommandFrom(url: URL) -> String? {
