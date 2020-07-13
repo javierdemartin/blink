@@ -38,6 +38,13 @@
 		22A9494C2067FD5E003A0666 /* tar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A9494A2067FD5E003A0666 /* tar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3352036EE87001FCC5C /* openssl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3332036EE86001FCC5C /* openssl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3362036EE87001FCC5C /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3342036EE86001FCC5C /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8030506624BC504400FCDBBB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80DFB2F224B90585002343A6 /* WidgetKit.framework */; };
+		8030506724BC504400FCDBBB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80DFB2F424B90585002343A6 /* SwiftUI.framework */; };
+		8030506A24BC504500FCDBBB /* Blinkdget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8030506924BC504500FCDBBB /* Blinkdget.swift */; };
+		8030506C24BC504600FCDBBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8030506B24BC504600FCDBBB /* Assets.xcassets */; };
+		8030507024BC504600FCDBBB /* BlinkdgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 8030506524BC504400FCDBBB /* BlinkdgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8030507724BC6B6D00FCDBBB /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8030507624BC6B6D00FCDBBB /* Model.swift */; };
+		8030507824BC6B7F00FCDBBB /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8030507624BC6B6D00FCDBBB /* Model.swift */; };
 		85A34307200A837A009324F1 /* webfontloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A34303200A837A009324F1 /* webfontloader.js */; };
 		85A34309200A8FAF009324F1 /* term.css in Resources */ = {isa = PBXBuildFile; fileRef = 85A34308200A8FAF009324F1 /* term.css */; };
 		B700AED81DD0F2C200100EBF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B700AED71DD0F2C200100EBF /* CloudKit.framework */; };
@@ -300,6 +307,13 @@
 			remoteGlobalIDString = 148993CF1D8F2515000132F7;
 			remoteInfo = TestHost;
 		};
+		8030506E24BC504600FCDBBB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA0BA1831C0CC57B00719C1A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8030506424BC504400FCDBBB;
+			remoteInfo = BlinkdgetExtension;
+		};
 		D24AFD5A222410E700CFD3C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0732F1051D062BF700AB5438 /* MBProgressHUD.xcodeproj */;
@@ -354,6 +368,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		80DFB30224B90587002343A6 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8030507024BC504600FCDBBB /* BlinkdgetExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -401,6 +426,14 @@
 		22A9494A2067FD5E003A0666 /* tar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tar.framework; sourceTree = "<group>"; };
 		22E1F3332036EE86001FCC5C /* openssl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openssl.framework; sourceTree = "<group>"; };
 		22E1F3342036EE86001FCC5C /* libssh2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libssh2.framework; sourceTree = "<group>"; };
+		8030506524BC504400FCDBBB /* BlinkdgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BlinkdgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8030506924BC504500FCDBBB /* Blinkdget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Blinkdget.swift; sourceTree = "<group>"; };
+		8030506B24BC504600FCDBBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8030506D24BC504600FCDBBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8030507424BC59E300FCDBBB /* BlinkdgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BlinkdgetExtension.entitlements; sourceTree = "<group>"; };
+		8030507624BC6B6D00FCDBBB /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		80DFB2F224B90585002343A6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		80DFB2F424B90585002343A6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		85A34303200A837A009324F1 /* webfontloader.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = webfontloader.js; sourceTree = "<group>"; };
 		85A34308200A8FAF009324F1 /* term.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = term.css; sourceTree = "<group>"; };
 		B700AED71DD0F2C200100EBF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -681,6 +714,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		8030506224BC504400FCDBBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8030506724BC504400FCDBBB /* SwiftUI.framework in Frameworks */,
+				8030506624BC504400FCDBBB /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D265FBB72317DD3C0017EAC4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -824,6 +866,8 @@
 				0732F0561D062BB300AB5438 /* lib */,
 				0732F05F1D062BB300AB5438 /* libssh2.framework */,
 				0732F0841D062BB300AB5438 /* openssl.framework */,
+				80DFB2F224B90585002343A6 /* WidgetKit.framework */,
+				80DFB2F424B90585002343A6 /* SwiftUI.framework */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -908,6 +952,17 @@
 			);
 			path = Sessions;
 			sourceTree = SOURCE_ROOT;
+		};
+		8030506824BC504400FCDBBB /* Blinkdget */ = {
+			isa = PBXGroup;
+			children = (
+				8030506924BC504500FCDBBB /* Blinkdget.swift */,
+				8030506B24BC504600FCDBBB /* Assets.xcassets */,
+				8030506D24BC504600FCDBBB /* Info.plist */,
+				8030507624BC6B6D00FCDBBB /* Model.swift */,
+			);
+			path = Blinkdget;
+			sourceTree = "<group>";
 		};
 		B75112C71DE4A7680040C693 /* UserConfiguration */ = {
 			isa = PBXGroup;
@@ -1359,9 +1414,11 @@
 		EA0BA1821C0CC57B00719C1A = {
 			isa = PBXGroup;
 			children = (
+				8030507424BC59E300FCDBBB /* BlinkdgetExtension.entitlements */,
 				D2C243F7238E44960082C69C /* KB */,
 				C9B2E0031D6B612300B89F69 /* Settings */,
 				D265FBBB2317DD3C0017EAC4 /* BlinkTests */,
+				8030506824BC504400FCDBBB /* Blinkdget */,
 				0732F04F1D062BB300AB5438 /* Frameworks */,
 				0732F0481D062B9A00AB5438 /* Resources */,
 				074F30781D062A2800A73445 /* main.m */,
@@ -1379,6 +1436,7 @@
 			children = (
 				EA0BA18B1C0CC57B00719C1A /* Blink.app */,
 				D265FBBA2317DD3C0017EAC4 /* BlinkTests.xctest */,
+				8030506524BC504400FCDBBB /* BlinkdgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1386,6 +1444,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		8030506424BC504400FCDBBB /* BlinkdgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8030507124BC504600FCDBBB /* Build configuration list for PBXNativeTarget "BlinkdgetExtension" */;
+			buildPhases = (
+				8030506124BC504400FCDBBB /* Sources */,
+				8030506224BC504400FCDBBB /* Frameworks */,
+				8030506324BC504400FCDBBB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BlinkdgetExtension;
+			productName = BlinkdgetExtension;
+			productReference = 8030506524BC504400FCDBBB /* BlinkdgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		D265FBB92317DD3C0017EAC4 /* BlinkTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D265FBC12317DD3C0017EAC4 /* Build configuration list for PBXNativeTarget "BlinkTests" */;
@@ -1412,12 +1487,14 @@
 				EA0BA1881C0CC57B00719C1A /* Frameworks */,
 				EA0BA1891C0CC57B00719C1A /* Resources */,
 				07A06D8C1D0618FC00ABEAFA /* Embed Frameworks */,
+				80DFB30224B90587002343A6 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				0732F1211D062DDB00AB5438 /* PBXTargetDependency */,
 				D24AFD5B222410E700CFD3C1 /* PBXTargetDependency */,
+				8030506F24BC504600FCDBBB /* PBXTargetDependency */,
 			);
 			name = Blink;
 			productName = Blink;
@@ -1431,10 +1508,15 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = "";
-				LastSwiftUpdateCheck = 1100;
+				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "Carlos Cabañero Projects SL";
 				TargetAttributes = {
+					8030506424BC504400FCDBBB = {
+						CreatedOnToolsVersion = 12.0;
+						DevelopmentTeam = HV2S48975V;
+						ProvisioningStyle = Automatic;
+					};
 					D265FBB92317DD3C0017EAC4 = {
 						CreatedOnToolsVersion = 11.0;
 						DevelopmentTeam = HV2S48975V;
@@ -1504,6 +1586,7 @@
 			targets = (
 				EA0BA18A1C0CC57B00719C1A /* Blink */,
 				D265FBB92317DD3C0017EAC4 /* BlinkTests */,
+				8030506424BC504400FCDBBB /* BlinkdgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1568,6 +1651,14 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8030506324BC504400FCDBBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8030506C24BC504600FCDBBB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D265FBB82317DD3C0017EAC4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1623,6 +1714,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		8030506124BC504400FCDBBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8030506A24BC504500FCDBBB /* Blinkdget.swift in Sources */,
+				8030507824BC6B7F00FCDBBB /* Model.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D265FBB62317DD3C0017EAC4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1670,6 +1770,7 @@
 				D27BBA1C20529FFF00AEA303 /* TermStream.m in Sources */,
 				D2036B6323967F2F0013D2A3 /* BindingConfigView.swift in Sources */,
 				D296198D214F96D50070935A /* digest-openssl.c in Sources */,
+				8030507724BC6B6D00FCDBBB /* Model.swift in Sources */,
 				D25D58102358897B00D1BCAE /* Complete.swift in Sources */,
 				B7D4503C1DD4706000CE0DBE /* Reachability.m in Sources */,
 				B752EE2E1DFEF45300E305C8 /* BKSecurityConfigurationViewController.m in Sources */,
@@ -1815,6 +1916,11 @@
 			name = UICKeyChainStore;
 			targetProxy = 0732F1201D062DDB00AB5438 /* PBXContainerItemProxy */;
 		};
+		8030506F24BC504600FCDBBB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8030506424BC504400FCDBBB /* BlinkdgetExtension */;
+			targetProxy = 8030506E24BC504600FCDBBB /* PBXContainerItemProxy */;
+		};
 		D24AFD5B222410E700CFD3C1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "MBProgressHUD Framework";
@@ -1847,6 +1953,77 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		8030507224BC504600FCDBBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlinkdgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HV2S48975V;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Blinkdget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = Com.CarlosCabanero.BlinkShell.Blinkdget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8030507324BC504600FCDBBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlinkdgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HV2S48975V;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = Blinkdget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = Com.CarlosCabanero.BlinkShell.Blinkdget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		D265FBC22317DD3C0017EAC4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2013,6 +2190,7 @@
 		EA0BA1AE1C0CC57C00719C1A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Blink/Blink.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -2058,6 +2236,7 @@
 		EA0BA1AF1C0CC57C00719C1A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Blink/Blink.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -2097,6 +2276,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		8030507124BC504600FCDBBB /* Build configuration list for PBXNativeTarget "BlinkdgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8030507224BC504600FCDBBB /* Debug */,
+				8030507324BC504600FCDBBB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		D265FBC12317DD3C0017EAC4 /* Build configuration list for PBXNativeTarget "BlinkTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

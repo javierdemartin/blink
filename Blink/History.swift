@@ -83,6 +83,45 @@ struct History {
         lines.remove(at: 0)
       }
       
+      // Widget stuff
+      // -----------------------------------------------------
+      let defaults = UserDefaults(suiteName: "group.com.carloscabanero")
+      let encoder = JSONEncoder()
+      
+      var commandUrl: URL?
+      
+      if BKDefaults.isXCallBackURLEnabled() {
+        if let keyItem = BKDefaults.xCallBackURLKey() {
+          
+          if let encodedQueryCommand = command.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed) {
+           
+            print("blinkshell://run?key=\(keyItem)&cmd=\(encodedQueryCommand)")
+            
+            commandUrl = URL(string: "blinkshell://run?key=\(keyItem)&cmd=\(encodedQueryCommand)")
+          }
+        }
+      }
+      
+      let command = LastCommandEntry(date: Date(), command: CommandHistory(command: command, commandUrl: commandUrl))
+      var commHistory: [LastCommandEntry] = []
+      
+      if let savedHistory = defaults?.object(forKey: "history") as? Data {
+          let decoder = JSONDecoder()
+          if let loadedPerson = try? decoder.decode([LastCommandEntry].self, from: savedHistory) {
+              dump(loadedPerson)
+            
+            commHistory = loadedPerson
+          }
+      }
+      
+      commHistory.append(command)
+      
+      if let encoded = try? encoder.encode(commHistory) {
+          defaults?.set(encoded, forKey: "history")
+      }
+      
+      // -----------------------------------------------------
+      
       _saveLines(lines)
     }
   }
@@ -102,9 +141,13 @@ struct History {
   }
   
   static func clear() {
+    
     _historyQueue.async {
       self._saveLines([])
     }
+    
+    let defaults = UserDefaults(suiteName: "group.com.carloscabanero")
+    defaults?.setValue(nil, forKey: "history")
   }
   
   private static func _getLines() -> [String] {
