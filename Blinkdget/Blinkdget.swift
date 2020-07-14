@@ -83,77 +83,66 @@ struct PlaceholderView : View {
   }
 }
 
-struct BlinkdgetItem: View {
-  
-  @Environment(\.widgetFamily) var family
-  let commandHistory: CommandHistory
-  
-  var body: some View {
-    
-    if let commandUrl = commandHistory.commandUrl {
-      HStack {
-        switch family {
-        case .systemMedium, .systemLarge:
-          Image(systemName: "chevron.right")
-            .foregroundColor(Color("BlinkTint"))
-            .padding(.leading, 5)
-        default:
-          Image(systemName: "chevron.right")
-            .foregroundColor(Color("BlinkTint"))
-        }
-        
-        Link(commandHistory.command, destination: commandUrl)
-          .font(.system(.body, design: .monospaced))
-      }
-      
-    } else {
-      HStack {
-        Image(systemName: "chevron.right")
-        Text(commandHistory.command)
-          .font(.system(.body, design: .monospaced))
-      }
-    }
-  }
-}
-
 struct BlinkdgetHeaderView: View {
     
     @State var numberOfActiveSessions: Int
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        HStack(spacing: -5) {
-          Image(systemName: "\(numberOfActiveSessions).circle.fill")
-            .foregroundColor(Color("BlinkTint"))
-            .font(.system(size: 30, weight: .regular))
-            .padding()
+        
+        switch family {
+        case .systemSmall:
           VStack(alignment: .leading) {
-            switch family {
-            case .systemSmall:
-                Text("Sessions")
-                  .font(.system(.body, design: .rounded))
-                  .bold()
-                  .lineLimit(1)
-            default:
-                Text("Active Sessions")
-                  .font(.system(.body, design: .rounded))
-                  .bold()
-                  .lineLimit(1)
+                HStack(spacing: -10) {
+                    Image(systemName: "\(numberOfActiveSessions).circle.fill")
+                        .foregroundColor(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+                        .font(.system(size: 50, weight: .regular))
+//                      .frame(minWidth: 0, maxWidth: .infinity)
+                      .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/, 4)
+                  
+                }
+            Text("Active Sessions")
+                .font(.system(.body, design: .rounded))
+                .bold()
+                .lineLimit(1)
+            
+                (Text("Last updated at ") + Text(Date(),style: .time))
+                    .font(.system(.caption, design: .rounded))
+                
             }
             
-            (Text(Date(),style: .time))
-              .font(.system(.caption, design: .rounded))
-          }
-            
-          Spacer()
-          
+        default:
+            HStack(spacing: -5) {
+              Image(systemName: "\(numberOfActiveSessions).circle.fill")
+                .foregroundColor(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+                .font(.system(size: 30, weight: .regular))
+                .padding()
+              VStack(alignment: .leading) {
+                switch family {
+                case .systemSmall:
+                    Text("Sessions")
+                      .font(.system(.body, design: .rounded))
+                      .bold()
+                      .lineLimit(1)
+                default:
+                    Text("Active Sessions")
+                      .font(.system(.body, design: .rounded))
+                      .bold()
+                      .lineLimit(1)
+                }
+                
+                (Text("Last updated at ") + Text(Date(),style: .time))
+                  .font(.system(.caption, design: .rounded))
+              }
+                
+              Spacer()
+            }
         }
     }
 }
 
 struct BlinkdgetCommandHistoryView: View {
     
-//    @Environment(\.widgetFamily) var family
     @State var commands: [LastCommandEntry]
     
     var body: some View {
@@ -163,8 +152,41 @@ struct BlinkdgetCommandHistoryView: View {
           if i != 1 {
             Divider()
                 .frame(height: 1)
-                .background(Color("BlinkTint"))
+                .background(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
           }
+        }
+    }
+}
+
+struct BlinkdgetItem: View {
+    
+    let commandHistory: CommandHistory
+    
+    var body: some View {
+        
+        if let commandUrl = commandHistory.commandUrl {
+            VStack(alignment: .trailing) {
+                HStack {
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+                        .padding(.leading, /*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
+                    
+                    Link(commandHistory.command, destination: commandUrl)
+                        .font(.system(.body, design: .monospaced))
+                    
+                    Spacer()
+                }
+            }
+            
+        } else {
+            VStack(alignment: .trailing) {
+                HStack {
+                    Image(systemName: "chevron.right")
+                    Text(commandHistory.command)
+                        .font(.system(.body, design: .monospaced))
+                    Spacer()
+                }
+            }
         }
     }
 }
@@ -183,12 +205,11 @@ struct BlinkdgetEntryView : View {
             
             BlinkdgetHeaderView(numberOfActiveSessions: entry.numberOfActiveSessions)
             
-            BlinkdgetCommandHistoryView(commands: entry.commands)
             Spacer()
               
               
           }
-          .padding([.leading, .trailing], 5)
+          .padding(7)
 
         case .systemMedium:
           VStack(alignment: .leading) {
@@ -217,7 +238,6 @@ struct BlinkdgetEntryView : View {
         
     }
 }
-
 
 // This defines a Widget, structs that inherits from widget and configures its capabilities
 @main
