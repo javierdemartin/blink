@@ -47,7 +47,7 @@ struct Provider: TimelineProvider {
       return
     }
     
-    let toShow = CommandEntryShown(date: Date(), commands: commands.reversed())
+    let toShow = CommandEntryShown(date: Date(), numberOfActiveSessions: 0, commands: commands.reversed())
     
     completion(toShow)
   }
@@ -60,7 +60,7 @@ struct Provider: TimelineProvider {
     
     dump(commands)
     
-    let timeline = Timeline(entries: [CommandEntryShown(date: Date(), commands: commands.reversed())], policy: .atEnd)
+    let timeline = Timeline(entries: [CommandEntryShown(date: Date(), numberOfActiveSessions: 0, commands: commands.reversed())], policy: .atEnd)
     
     completion(timeline)
   }
@@ -77,6 +77,8 @@ struct PlaceholderView : View {
             .stroke(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)), lineWidth: 4)
         )
     }
+    
+    // TODO: add .isPlaceholder(true). Not yet available in beta 2 (neither beta 1)
   }
 }
 
@@ -90,13 +92,6 @@ struct BlinkdgetItem: View {
       HStack {
         Image(systemName: "chevron.right")
           .foregroundColor(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
-        //          Button(action: {
-        //              // your action here
-        //            UIApplication.shared.open(commandUrl)
-        //          }) {
-        //            Text(commandHistory.command)
-        //              .font(.system(.body, design: .monospaced))
-        //          }
         
         Link(commandHistory.command, destination: commandUrl)
           .font(.system(.body, design: .monospaced))
@@ -112,62 +107,106 @@ struct BlinkdgetItem: View {
   }
 }
 
-struct BlinkdgetEntryView : View {
-  var entry: Provider.Entry
-  
-  @Environment(\.widgetFamily) var family
-  
-  @ViewBuilder
-  var body: some View {
+struct BlinkdgetHeaderView: View {
     
-    if entry.commands.count == 0 {
-      
-      PlaceholderView()
-      Text("Enable x-callback-url to enable interactiveness")
-      
-    } else {
-      
-      switch family {
-      case .systemSmall:
-        VStack(alignment: .leading) {
-          ForEach((0...2), id: \.self) { i in
-            BlinkdgetItem(commandHistory: entry.commands[i].command)
-            Divider()
-              .frame(height: 1.5)
-              .background(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
-          }
-        }
-        .padding(7)
-        
-      case .systemMedium:
-        VStack(alignment: .leading) {
-          // TODO: Check if there ara enough commands
-          ForEach((0...2), id: \.self) { i in
-            BlinkdgetItem(commandHistory: entry.commands[i].command)
-            Divider()
-              .frame(height: 1.5)
-              .background(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
-          }
-        }
-        .padding(7)
-        
-        
-      default:
-        VStack(alignment: .leading) {
-          ForEach((0...5), id: \.self) { i in
-            BlinkdgetItem(commandHistory: entry.commands[i].command)
-            Divider()
-              .frame(height: 1.5)
-              .background(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+    @State var numberOfActiveSessions: Int
+    @Environment(\.widgetFamily) var family
+    
+    var body: some View {
+        HStack(spacing: 5) {
+          Image(systemName: "\(numberOfActiveSessions).circle.fill")
+            .foregroundColor(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+            .font(.system(size: 30, weight: .regular))
+            .padding()
+          VStack(alignment: .leading) {
+            switch family {
+            case .systemSmall:
+                Text("Sessions")
+                  .font(.system(.body, design: .rounded))
+                  .bold()
+                  .lineLimit(1)
+            default:
+                Text("Active Sessions")
+                  .font(.system(.body, design: .rounded))
+                  .bold()
+                  .lineLimit(1)
+            }
             
+            (Text(Date(),style: .time))
+              .font(.system(.caption, design: .rounded))
+          }
+            
+          Spacer()
+          
+        }
+    }
+}
+
+struct BlinkdgetCommandHistoryView: View {
+    
+//    @Environment(\.widgetFamily) var family
+    @State var commands: [LastCommandEntry]
+    
+    var body: some View {
+        ForEach((0...1), id: \.self) { i in
+            BlinkdgetItem(commandHistory: commands[i].command)
+          
+          if i != 1 {
+            Divider()
+                .frame(height: 1)
+                .background(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
           }
         }
-        .padding(7)
-        
-      }
-      
     }
-  }
+}
+
+struct BlinkdgetEntryView : View {
+    var entry: CommandEntryShown
+    
+    @Environment(\.widgetFamily) var family
+    
+    var body: some View {
+        
+        
+        switch family {
+        case .systemSmall:
+          VStack(alignment: .leading) {
+            
+            BlinkdgetHeaderView(numberOfActiveSessions: entry.numberOfActiveSessions)
+            
+            BlinkdgetCommandHistoryView(commands: entry.commands)
+            Spacer()
+              
+              
+          }
+          .padding(7)
+
+        case .systemMedium:
+          VStack(alignment: .leading) {
+            
+            BlinkdgetHeaderView(numberOfActiveSessions: entry.numberOfActiveSessions)
+              
+            BlinkdgetCommandHistoryView(commands: entry.commands)
+            Spacer()
+
+          }
+          .padding(7)
+
+
+        default:
+          VStack(alignment: .leading) {
+            
+            BlinkdgetHeaderView(numberOfActiveSessions: entry.numberOfActiveSessions)
+              
+            BlinkdgetCommandHistoryView(commands: entry.commands)
+            
+              Spacer()
+          }
+          .padding(7)
+
+        }
+        
+    }
 }
 
 

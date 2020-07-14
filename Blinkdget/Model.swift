@@ -46,5 +46,6 @@ struct CommandHistory: Codable, Hashable {
 struct CommandEntryShown: TimelineEntry, Codable {
   
   public let date: Date
+  public let numberOfActiveSessions: Int
   public let commands: [LastCommandEntry]
 }
