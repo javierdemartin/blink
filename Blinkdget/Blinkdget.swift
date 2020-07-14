@@ -35,7 +35,7 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
   
-  @AppStorage("history", store: UserDefaults(suiteName: "group.com.carloscabanero"))
+  @AppStorage("history", store: UserDefaults(suiteName: BlinkdgetDefaults.groupUserDefaults))
   var commandData: Data = Data()
   
   public typealias Entry = CommandEntryShown
@@ -122,7 +122,7 @@ struct BlinkdgetHeaderView: View {
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        HStack(spacing: 5) {
+        HStack(spacing: -5) {
           Image(systemName: "\(numberOfActiveSessions).circle.fill")
             .foregroundColor(Color("BlinkTint"))
             .font(.system(size: 30, weight: .regular))
@@ -188,7 +188,7 @@ struct BlinkdgetEntryView : View {
               
               
           }
-          .padding(7)
+          .padding([.leading, .trailing], 5)
 
         case .systemMedium:
           VStack(alignment: .leading) {
@@ -222,6 +222,7 @@ struct BlinkdgetEntryView : View {
 // This defines a Widget, structs that inherits from widget and configures its capabilities
 @main
 struct Blinkdget: Widget {
+  // Has to be the exact same name as the struct
   private let kind: String = "Blinkdget"
   
   let displayName: LocalizedStringKey = "WIDGET_NAME"

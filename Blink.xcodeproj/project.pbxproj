@@ -45,6 +45,7 @@
 		8030507024BC504600FCDBBB /* BlinkdgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 8030506524BC504400FCDBBB /* BlinkdgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8030507724BC6B6D00FCDBBB /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8030507624BC6B6D00FCDBBB /* Model.swift */; };
 		8030507824BC6B7F00FCDBBB /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8030507624BC6B6D00FCDBBB /* Model.swift */; };
+		803050D024BDABC200FCDBBB /* BlinkdgetDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803050CE24BDAACD00FCDBBB /* BlinkdgetDefaults.swift */; };
 		85A34307200A837A009324F1 /* webfontloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A34303200A837A009324F1 /* webfontloader.js */; };
 		85A34309200A8FAF009324F1 /* term.css in Resources */ = {isa = PBXBuildFile; fileRef = 85A34308200A8FAF009324F1 /* term.css */; };
 		B700AED81DD0F2C200100EBF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B700AED71DD0F2C200100EBF /* CloudKit.framework */; };
@@ -432,6 +433,7 @@
 		8030506D24BC504600FCDBBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8030507424BC59E300FCDBBB /* BlinkdgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BlinkdgetExtension.entitlements; sourceTree = "<group>"; };
 		8030507624BC6B6D00FCDBBB /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		803050CE24BDAACD00FCDBBB /* BlinkdgetDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlinkdgetDefaults.swift; sourceTree = "<group>"; };
 		80DFB2F224B90585002343A6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		80DFB2F424B90585002343A6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		85A34303200A837A009324F1 /* webfontloader.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = webfontloader.js; sourceTree = "<group>"; };
@@ -960,6 +962,7 @@
 				8030506B24BC504600FCDBBB /* Assets.xcassets */,
 				8030506D24BC504600FCDBBB /* Info.plist */,
 				8030507624BC6B6D00FCDBBB /* Model.swift */,
+				803050CE24BDAACD00FCDBBB /* BlinkdgetDefaults.swift */,
 			);
 			path = Blinkdget;
 			sourceTree = "<group>";
@@ -1718,6 +1721,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				803050D024BDABC200FCDBBB /* BlinkdgetDefaults.swift in Sources */,
 				8030506A24BC504500FCDBBB /* Blinkdget.swift in Sources */,
 				8030507824BC6B7F00FCDBBB /* Model.swift in Sources */,
 			);
