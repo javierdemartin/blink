@@ -74,24 +74,33 @@ struct PlaceholderView : View {
         .padding(7)
         .overlay(
           RoundedRectangle(cornerRadius: 9)
-            .stroke(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)), lineWidth: 4)
+            .stroke(Color("BlinkTint"), lineWidth: 4)
         )
     }
     
     // TODO: add .isPlaceholder(true). Not yet available in beta 2 (neither beta 1)
+    // Source: https://developer.apple.com/forums/thread/650564
   }
 }
 
 struct BlinkdgetItem: View {
   
+  @Environment(\.widgetFamily) var family
   let commandHistory: CommandHistory
   
   var body: some View {
     
     if let commandUrl = commandHistory.commandUrl {
       HStack {
-        Image(systemName: "chevron.right")
-          .foregroundColor(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+        switch family {
+        case .systemMedium, .systemLarge:
+          Image(systemName: "chevron.right")
+            .foregroundColor(Color("BlinkTint"))
+            .padding(.leading, 5)
+        default:
+          Image(systemName: "chevron.right")
+            .foregroundColor(Color("BlinkTint"))
+        }
         
         Link(commandHistory.command, destination: commandUrl)
           .font(.system(.body, design: .monospaced))
@@ -115,7 +124,7 @@ struct BlinkdgetHeaderView: View {
     var body: some View {
         HStack(spacing: 5) {
           Image(systemName: "\(numberOfActiveSessions).circle.fill")
-            .foregroundColor(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+            .foregroundColor(Color("BlinkTint"))
             .font(.system(size: 30, weight: .regular))
             .padding()
           VStack(alignment: .leading) {
@@ -154,7 +163,7 @@ struct BlinkdgetCommandHistoryView: View {
           if i != 1 {
             Divider()
                 .frame(height: 1)
-                .background(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
+                .background(Color("BlinkTint"))
           }
         }
     }
