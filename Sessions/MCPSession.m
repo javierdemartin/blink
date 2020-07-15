@@ -214,6 +214,10 @@
   WeakSSHClient *client = [[WeakSSHClient alloc] init];
   client.value = sshClient;
   [_sshClients addObject:client];
+  
+//  // TODO: Register new connection
+  [HistoryObj appendNewSessionToCommandHistory];
+  
 }
 
 - (void)unregisterSSHClient:(SSHClient *)sshClient {
@@ -226,6 +230,9 @@
   }
   
   [_sshClients removeObject:foundClient];
+  
+  // TODO: De-register new connection
+  [HistoryObj deregisterSessionFromCommandHistory];
 }
 
 - (bool)isRunningCmd {
@@ -279,6 +286,10 @@
 
 - (void)_runMoshWithArgs:(NSString *)args
 {
+  
+  // TODO: Register new connection
+  [HistoryObj appendNewSessionToCommandHistory];
+  
   self.sessionParams.childSessionParams = [[MoshParams alloc] init];
   self.sessionParams.childSessionType = @"mosh";
   _childSession = [[MoshSession alloc] initWithDevice:_device andParams:self.sessionParams.childSessionParams];
@@ -288,6 +299,10 @@
 
 - (void)_runSSHWithArgs:(NSString *)args
 {
+  
+  // TODO: Register new connection
+  [HistoryObj appendNewSessionToCommandHistory];
+  
   self.sessionParams.childSessionParams = nil;
   _childSession = [[SSHSession alloc] initWithDevice:_device andParams:self.sessionParams.childSessionParams];
   self.sessionParams.childSessionType = @"ssh";
@@ -305,6 +320,10 @@
 
 - (void)kill
 {
+  
+  // TODO: De-register new connection
+  [HistoryObj deregisterSessionFromCommandHistory];
+  
   if (_sshClients.count > 0) {
     for (WeakSSHClient *client in _sshClients) {
       [client.value kill];

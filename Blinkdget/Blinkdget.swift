@@ -43,24 +43,30 @@ struct Provider: TimelineProvider {
   // Sample data
   public func snapshot(with context: Context, completion: @escaping (CommandEntryShown) -> ()) {
     
-    guard let commands = try? JSONDecoder().decode([LastCommandEntry].self, from: commandData) else {
+    guard let commands = try? JSONDecoder().decode(CommandEntryShown.self, from: commandData) else {
       return
     }
     
-    let toShow = CommandEntryShown(date: Date(), numberOfActiveSessions: 0, commands: commands.reversed())
+    let toShow = CommandEntryShown(date: Date(), numberOfActiveSessions: 0, commands: commands.commands.reversed())
     
     completion(toShow)
   }
   
   public func timeline(with context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
     
-    guard let commands = try? JSONDecoder().decode([LastCommandEntry].self, from: commandData) else {
+    guard var commands = try? JSONDecoder().decode(CommandEntryShown.self, from: commandData) else {
       return
     }
     
     dump(commands)
     
-    let timeline = Timeline(entries: [CommandEntryShown(date: Date(), numberOfActiveSessions: 0, commands: commands.reversed())], policy: .atEnd)
+    var nActiveSessions = commands.numberOfActiveSessions
+    
+    if nActiveSessions < 0 {
+      nActiveSessions = 0
+    }
+    
+    let timeline = Timeline(entries: [CommandEntryShown(date: Date(), numberOfActiveSessions: nActiveSessions, commands: commands.commands.reversed())], policy: .atEnd)
     
     completion(timeline)
   }
@@ -143,11 +149,15 @@ struct BlinkdgetHeaderView: View {
 
 struct BlinkdgetCommandHistoryView: View {
     
-    @State var commands: [LastCommandEntry]
+    @State var commandHistory: CommandEntryShown
+  let numberOfCommandsToShow = 1
     
     var body: some View {
-        ForEach((0...1), id: \.self) { i in
-            BlinkdgetItem(commandHistory: commands[i].command)
+      
+      if commandHistory.commands.count > numberOfCommandsToShow {
+      
+        ForEach((0...numberOfCommandsToShow), id: \.self) { i in
+          BlinkdgetItem(commandHistory: commandHistory.commands[i].command)
           
           if i != 1 {
             Divider()
@@ -155,6 +165,10 @@ struct BlinkdgetCommandHistoryView: View {
                 .background(Color(UIColor(red: 7/255, green: 191/255, blue: 204/255, alpha: 1.0)))
           }
         }
+      } else {
+        Text("No commands found")
+          .font(.system(.body, design: .monospaced))
+      }
     }
 }
 
@@ -216,7 +230,7 @@ struct BlinkdgetEntryView : View {
             
             BlinkdgetHeaderView(numberOfActiveSessions: entry.numberOfActiveSessions)
               
-            BlinkdgetCommandHistoryView(commands: entry.commands)
+            BlinkdgetCommandHistoryView(commandHistory: entry)
             Spacer()
 
           }
@@ -228,7 +242,7 @@ struct BlinkdgetEntryView : View {
             
             BlinkdgetHeaderView(numberOfActiveSessions: entry.numberOfActiveSessions)
               
-            BlinkdgetCommandHistoryView(commands: entry.commands)
+            BlinkdgetCommandHistoryView(commandHistory: entry)
             
               Spacer()
           }
