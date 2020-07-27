@@ -52,6 +52,8 @@
   UIBackgroundTaskIdentifier _suspendTaskId;
   BOOL _suspendedMode;
   BOOL _enforceSuspension;
+  // Manually requesting a receipt from either App Store or Sandbox App Store
+  ReceiptFetcher * receiptFetcher; // = [ReceiptFetcher alloc];
 }
   
 void __on_pipebroken_signal(int signum){
@@ -83,6 +85,8 @@ void __setupProcessEnv() {
     [BlinkPaths linkICloudDriveIfNeeded];
   });
 
+  receiptFetcher = [[ReceiptFetcher alloc] init];
+  
   sideLoading = false; // Turn off extra commands from iOS system
   initializeEnvironment(); // initialize environment variables for iOS system
   dispatch_async(bgQueue, ^{
@@ -108,6 +112,9 @@ void __setupProcessEnv() {
   
 //  [nc addObserver:self selector:@selector(_logEvent:) name:nil object:nil];
 //  [nc addObserver:self selector:@selector(_active) name:@"UIApplicationSystemNavigationActionChangedNotification" object:nil];
+  
+  
+  
 
   [UIApplication sharedApplication].applicationSupportsShakeToEdit = NO;
   return YES;

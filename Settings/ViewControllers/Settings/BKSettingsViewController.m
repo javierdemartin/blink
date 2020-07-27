@@ -40,6 +40,8 @@
 
 @interface BKSettingsViewController ()
 
+
+@property (weak, nonatomic) IBOutlet UILabel *purchaseDateSatistics;
 @property (nonatomic, weak) IBOutlet UILabel *userNameLabel;
 @property (nonatomic, weak) IBOutlet UILabel *iCloudSyncStatusLabel;
 @property (nonatomic, weak) IBOutlet UILabel *autoLockStatusLabel;
@@ -67,6 +69,7 @@
 }
 
 - (void)_closeConfig:(UIKeyCommand *)cmd
+
 {
   [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -80,6 +83,12 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
+  
+  self.purchaseDateSatistics.text = [NSString stringWithFormat:@"You've used Blink for %ld days.", (long)ReceiptFetcher.shared.daysInUse];
+  
+  if (![ReceiptFetcher.shared.initialAppVersion  isEqual: @""]) {
+    self.purchaseDateSatistics.text = [self.purchaseDateSatistics.text stringByAppendingString:[NSString stringWithFormat:@" Since version %@.", ReceiptFetcher.shared.initialAppVersion]];
+  }
   
   self.userNameLabel.text = [BKDefaults defaultUserName];;
   self.iCloudSyncStatusLabel.text = [BKUserConfigurationManager userSettingsValueForKey:BKUserConfigiCloud] ? @"On" : @"Off";
