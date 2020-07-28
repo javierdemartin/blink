@@ -85,7 +85,7 @@ void __setupProcessEnv() {
     [BlinkPaths linkICloudDriveIfNeeded];
   });
 
-  receiptFetcher = [[ReceiptFetcher alloc] init];
+//  receiptFetcher = [[ReceiptFetcher alloc] init];
   
   sideLoading = false; // Turn off extra commands from iOS system
   initializeEnvironment(); // initialize environment variables for iOS system

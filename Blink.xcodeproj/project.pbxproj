@@ -38,7 +38,12 @@
 		22A9494C2067FD5E003A0666 /* tar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A9494A2067FD5E003A0666 /* tar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3352036EE87001FCC5C /* openssl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3332036EE86001FCC5C /* openssl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3362036EE87001FCC5C /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3342036EE86001FCC5C /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		80BC25F624C9DD2A00198E57 /* IAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BC25F524C9DD2A00198E57 /* IAPHelper.swift */; };
+		80692ED324D02203006AB221 /* StoreKitProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80692ED224D02203006AB221 /* StoreKitProducts.swift */; };
+		80692EDB24D022AE006AB221 /* IAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80692EDA24D022AE006AB221 /* IAPHelper.swift */; };
+		80692EDD24D025A0006AB221 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80692EDC24D025A0006AB221 /* StoreKit.framework */; };
+		80BC25F624C9DD2A00198E57 /* ReceiptFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BC25F524C9DD2A00198E57 /* ReceiptFetcher.swift */; };
+		80DC430224D0168E00E9CF94 /* SuscriptionSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DC430124D0168E00E9CF94 /* SuscriptionSettingsViewController.swift */; };
+		80DC430424D0189100E9CF94 /* SuscriptionSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DC430324D0189100E9CF94 /* SuscriptionSettingsViewModel.swift */; };
 		85A34307200A837A009324F1 /* webfontloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A34303200A837A009324F1 /* webfontloader.js */; };
 		85A34309200A8FAF009324F1 /* term.css in Resources */ = {isa = PBXBuildFile; fileRef = 85A34308200A8FAF009324F1 /* term.css */; };
 		B700AED81DD0F2C200100EBF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B700AED71DD0F2C200100EBF /* CloudKit.framework */; };
@@ -402,7 +407,12 @@
 		22A9494A2067FD5E003A0666 /* tar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tar.framework; sourceTree = "<group>"; };
 		22E1F3332036EE86001FCC5C /* openssl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openssl.framework; sourceTree = "<group>"; };
 		22E1F3342036EE86001FCC5C /* libssh2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libssh2.framework; sourceTree = "<group>"; };
-		80BC25F524C9DD2A00198E57 /* IAPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPHelper.swift; sourceTree = "<group>"; };
+		80692ED224D02203006AB221 /* StoreKitProducts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitProducts.swift; sourceTree = "<group>"; };
+		80692EDA24D022AE006AB221 /* IAPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPHelper.swift; sourceTree = "<group>"; };
+		80692EDC24D025A0006AB221 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		80BC25F524C9DD2A00198E57 /* ReceiptFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptFetcher.swift; sourceTree = "<group>"; };
+		80DC430124D0168E00E9CF94 /* SuscriptionSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuscriptionSettingsViewController.swift; sourceTree = "<group>"; };
+		80DC430324D0189100E9CF94 /* SuscriptionSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuscriptionSettingsViewModel.swift; sourceTree = "<group>"; };
 		85A34303200A837A009324F1 /* webfontloader.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = webfontloader.js; sourceTree = "<group>"; };
 		85A34308200A8FAF009324F1 /* term.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = term.css; sourceTree = "<group>"; };
 		B700AED71DD0F2C200100EBF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -709,6 +719,7 @@
 				D2A3F4EA20690B71006BB305 /* text.framework in Frameworks */,
 				D2A3F4F620690C24006BB305 /* awk.framework in Frameworks */,
 				D263489820BEBFE000A8E89F /* libsshd.a in Frameworks */,
+				80692EDD24D025A0006AB221 /* StoreKit.framework in Frameworks */,
 				0732F0D11D062BB400AB5438 /* openssl.framework in Frameworks */,
 				0732F0BE1D062BB400AB5438 /* libssh2.framework in Frameworks */,
 				076FBD501DB6BD9400F6D997 /* libmoshios.framework in Frameworks */,
@@ -802,6 +813,7 @@
 		0732F04F1D062BB300AB5438 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				80692EDC24D025A0006AB221 /* StoreKit.framework */,
 				D28DB3AB210B110B008A1139 /* libcompression.tbd */,
 				D2E4F92920B2BB4500B30F7B /* curl_ios_static.xcodeproj */,
 				D2A3F4F520690C24006BB305 /* awk.framework */,
@@ -915,9 +927,20 @@
 		80BC25EE24C9DD1C00198E57 /* StoreKit */ = {
 			isa = PBXGroup;
 			children = (
-				80BC25F524C9DD2A00198E57 /* IAPHelper.swift */,
+				80BC25F524C9DD2A00198E57 /* ReceiptFetcher.swift */,
+				80692EDA24D022AE006AB221 /* IAPHelper.swift */,
+				80692ED224D02203006AB221 /* StoreKitProducts.swift */,
 			);
 			path = StoreKit;
+			sourceTree = "<group>";
+		};
+		80DC42FA24D0166B00E9CF94 /* Suscription */ = {
+			isa = PBXGroup;
+			children = (
+				80DC430124D0168E00E9CF94 /* SuscriptionSettingsViewController.swift */,
+				80DC430324D0189100E9CF94 /* SuscriptionSettingsViewModel.swift */,
+			);
+			path = Suscription;
 			sourceTree = "<group>";
 		};
 		B75112C71DE4A7680040C693 /* UserConfiguration */ = {
@@ -1008,6 +1031,7 @@
 		C9B2E0031D6B612300B89F69 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				80DC42FA24D0166B00E9CF94 /* Suscription */,
 				C94E9B611D6BA21C00DA4DD6 /* DismissSegue.h */,
 				C94E9B621D6BA21C00DA4DD6 /* DismissSegue.m */,
 				C9B2E0041D6B612300B89F69 /* Settings.storyboard */,
@@ -1653,6 +1677,7 @@
 			files = (
 				D296197F214F91550070935A /* sshkey.c in Sources */,
 				D2961989214F96A10070935A /* chacha.c in Sources */,
+				80692ED324D02203006AB221 /* StoreKitProducts.swift in Sources */,
 				D241CBDF23040734003D64A5 /* KBKeyAccessibilityElement.swift in Sources */,
 				D2D75EE021AFDA10007336B6 /* LayoutManager.m in Sources */,
 				B7A4876D1DC7C709007BA809 /* BKSettingsViewController.m in Sources */,
@@ -1662,6 +1687,7 @@
 				0716B5721CFFAB9300268B5B /* AppDelegate.m in Sources */,
 				07F670731D05EEE200C0A53C /* MoshSession.m in Sources */,
 				07F670721D05EEE200C0A53C /* MCPSession.m in Sources */,
+				80DC430424D0189100E9CF94 /* SuscriptionSettingsViewModel.swift in Sources */,
 				D23742CA21106ADF00366359 /* bench.m in Sources */,
 				D2071B83215101DC000156D7 /* blink-compat.c in Sources */,
 				D240806120BC8DF800F30099 /* tool_main.c in Sources */,
@@ -1684,6 +1710,7 @@
 				D25D58102358897B00D1BCAE /* Complete.swift in Sources */,
 				B7D4503C1DD4706000CE0DBE /* Reachability.m in Sources */,
 				B752EE2E1DFEF45300E305C8 /* BKSecurityConfigurationViewController.m in Sources */,
+				80DC430224D0168E00E9CF94 /* SuscriptionSettingsViewController.swift in Sources */,
 				D2F330D420A6F1DF0074ADD7 /* clear.m in Sources */,
 				C94437571D8311960096F84E /* BKResource.m in Sources */,
 				D2CF27292428A791009885ED /* KBTracker.swift in Sources */,
@@ -1740,6 +1767,7 @@
 				D29568B921BE629100480A83 /* bk_getopts.c in Sources */,
 				07E3AEC61D9190CF007BC086 /* BKAboutViewController.m in Sources */,
 				D2F330D620A6F4F50074ADD7 /* history.m in Sources */,
+				80692EDB24D022AE006AB221 /* IAPHelper.swift in Sources */,
 				D2EFE1F520B7FAFC0087888B /* link_files.m in Sources */,
 				D2C24418238E44AB0082C69C /* KBConfigView.swift in Sources */,
 				D2F330CA20A6CB840074ADD7 /* help.m in Sources */,
@@ -1747,7 +1775,7 @@
 				D241CBD223040734003D64A5 /* KBDevice.swift in Sources */,
 				D2334D1C21495DAE00D26AC3 /* udptunnel.m in Sources */,
 				C9B2E0311D6B612400B89F69 /* BKDefaults.m in Sources */,
-				80BC25F624C9DD2A00198E57 /* IAPHelper.swift in Sources */,
+				80BC25F624C9DD2A00198E57 /* ReceiptFetcher.swift in Sources */,
 				D296199A214F995D0070935A /* blocks.c in Sources */,
 				D242157822E878950037E5A6 /* UIColor+Codable.swift in Sources */,
 				07F670751D05EEE200C0A53C /* Session.m in Sources */,

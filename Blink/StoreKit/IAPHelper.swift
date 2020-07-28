@@ -30,189 +30,219 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-//#if DEBUG
-//let urlString = "https://sandbox.itunes.apple.com/verifyReceipt"
-//#else
-//let urlString = "https://buy.itunes.apple.com/verifyReceipt"
-//#endif
-
-// https://fluffy.es/migrate-paid-app-to-iap/
-// https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html
-
-enum ReceiptValidationError: Error {
-    case receiptNotFound
-    case jsonResponseIsNotValid(description: String)
-    case notBought
-    case expired
-}
-
-struct ReceiptDataToShow {
-  
-  let originalPurchasedVersion: String
-  let daysInUse: Int
-}
-
+import Foundation
 import StoreKit
 
-@objc
-class ReceiptFetcher : NSObject, SKRequestDelegate {
-  let receiptRefreshRequest = SKReceiptRefreshRequest()
+struct ReceiptData: Codable {
+  let receipt: String
+  let sandbox: Bool
+}
+
+struct AppStoreValidationResult: Codable {
+  let status: Int
+  let environment: String
+}
+
+public typealias ProductIdentifier = String
+public typealias ProductsRequestCompletionHandler = (_ success: Bool, _ products: [SKProduct]?) -> Void
+
+extension Notification.Name {
+  static let IAPHelperPurchaseNotification = Notification.Name("IAPHelperPurchaseNotification")
+}
+
+protocol IAPHelperDelegate: class {
   
-  @objc static let shared: ReceiptFetcher = {
-      let instance = ReceiptFetcher()
-      // Setup code
-      return instance
-    }()
+  func didFail(with error: String)
+//  func previouslyPurchased(status: Bool)
+  func gotProductIdentifiersAndPricing(products: [SKProduct])
+  func finishedRestoringPurchases()
+}
+
+open class IAPHelper: NSObject {
   
-  @objc var daysInUse: Int = -1
-  @objc var initialAppVersion: String = ""
+  private let productIdentifiers: Set<ProductIdentifier>
+  private var purchasedProductIdentifiers: Set<ProductIdentifier> = []
+  private var productsRequest: SKProductsRequest?
+  private var productsRequestCompletionHandler: ProductsRequestCompletionHandler?
   
-//  @objc var dataToShow: ReceiptDataToShow?
+  weak var delegate: IAPHelperDelegate?
   
-  override init() {
+  public init(productIds: Set<ProductIdentifier>) {
+    
+    productIdentifiers = productIds
     super.init()
-    // set delegate to self so when the receipt is retrieved,
-    // the delegate methods will be called
-    receiptRefreshRequest.delegate = self
     
     SKPaymentQueue.default().add(self)
+  }
+}
+
+extension IAPHelper: SKRequestDelegate {
+  
+  public func requestDidFinish(_ request: SKRequest) {
+    dump(request)
     
-    fetchReceipt()
+    // TODO: Delegate finished
+    
+  }
+}
+
+// MARK: - StoreKit API
+extension IAPHelper {
+  
+  public func requestProducts(_ completionHandler: @escaping ProductsRequestCompletionHandler) {
+    productsRequest?.cancel()
+    productsRequestCompletionHandler = completionHandler
+    
+    productsRequest = SKProductsRequest(productIdentifiers: productIdentifiers)
+    productsRequest!.delegate = self
+    productsRequest!.start()
   }
   
-  @objc
-  func fetchReceipt() {
-    guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
-      print("unable to retrieve receipt url")
-      return
+  public func buyProduct(_ product: SKProduct) {
+    print("Buying \(product.productIdentifier)...")
+    let payment = SKPayment(product: product)
+    SKPaymentQueue.default().add(payment)
+  }
+  
+  public func isProductPurchased(_ productIdentifier: ProductIdentifier) -> Bool {
+    
+    //        let defaults = UserDefaults(suiteName: Constants.appGroupsBundleID)!
+    //        return defaults.bool(forKey: StoreKitProducts.DataInsights)
+    return true
+  }
+  
+  public class func canMakePayments() -> Bool {
+    return SKPaymentQueue.canMakePayments()
+  }
+  
+  /**
+    Restore/Install purchases on additional devices or that the user deleted and has reinstalled.
+   */
+  public func restorePurchases() {
+    SKPaymentQueue.default().restoreCompletedTransactions()
+  }
+}
+
+// MARK: - SKProductsRequestDelegate
+
+extension IAPHelper: SKProductsRequestDelegate {
+  
+  /**
+    Called by the delegate when `restoreCompletedTransactions()` **succeeds**.
+   */
+  public func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+    print("finished")
+  }
+  
+  /**
+    Called by the delegate when `restoreCompletedTransactions()` **fails**
+   */
+  public func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
+    print(error.localizedDescription)
+  }
+  
+  public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+    print("Loaded list of products...")
+    let products = response.products
+    productsRequestCompletionHandler?(true, products)
+    clearRequestAndHandler()
+    
+    for p in products {
+      print("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
     }
     
-    do {
-      // if the receipt does not exist, start refreshing
-      let reachable = try receiptUrl.checkResourceIsReachable()
-      
-      // the receipt does not exist, start refreshing
-      if reachable == false {
-        receiptRefreshRequest.start()
+    delegate?.gotProductIdentifiersAndPricing(products: products)
+  }
+  
+  public func request(_ request: SKRequest, didFailWithError error: Error) {
+    print("Failed to load list of products.")
+    print("Error: \(error.localizedDescription)")
+    productsRequestCompletionHandler?(false, nil)
+    clearRequestAndHandler()
+  }
+  
+  private func clearRequestAndHandler() {
+    productsRequest = nil
+    productsRequestCompletionHandler = nil
+  }
+}
+
+// MARK: - SKPaymentTransactionObserver
+
+extension IAPHelper: SKPaymentTransactionObserver {
+  
+  public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+    for transaction in transactions {
+      switch transaction.transactionState {
+      case .purchased:
+        complete(transaction: transaction)
+      case .failed:
+        fail(transaction: transaction)
+      case .restored:
+        restore(transaction: transaction)
+      case .deferred:
+        break
+      case .purchasing:
+        // Presented the buying sheet, awaiting for the user's transaction...
+        break
+      @unknown default:
+        fatalError()
       }
+    }
+  }
+  
+  private func complete(transaction: SKPaymentTransaction) {
+    print("complete...")
+    deliverPurchaseNotificationFor(identifier: transaction.payment.productIdentifier)
+    SKPaymentQueue.default().finishTransaction(transaction)
+  }
+  
+  private func restore(transaction: SKPaymentTransaction) {
+    guard let productIdentifier = transaction.original?.payment.productIdentifier else { return }
+    
+    // Get the receipt if it's available
+    if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL,
+       FileManager.default.fileExists(atPath: appStoreReceiptURL.path) {
       
-      if FileManager.default.fileExists(atPath: receiptUrl.path) {
+      do {
+        let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
+        print(receiptData)
         
-        do {
-          
-          let receiptData = try! Data(contentsOf: receiptUrl, options: .alwaysMapped)
-          let receiptString = receiptData.base64EncodedString()
-          
-          let jsonObjectBody = ["receipt-data" : receiptString]
-          
-//          #if DEBUG
-//          let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")!
-//          #else
-//          let url = URL(string: "https://buy.itunes.apple.com/verifyReceipt")!
-//          #endif
-          
-          let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")!
-          
-          var request = URLRequest(url: url)
-          request.httpMethod = "POST"
-          request.httpBody = try! JSONSerialization.data(withJSONObject: jsonObjectBody, options: .prettyPrinted)
-          
-          let semaphore = DispatchSemaphore(value: 0)
-          
-          var validationError : ReceiptValidationError?
-          
-          let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, let httpResponse = response as? HTTPURLResponse, error == nil, httpResponse.statusCode == 200 else {
-              validationError = ReceiptValidationError.jsonResponseIsNotValid(description: error?.localizedDescription ?? "")
-              semaphore.signal()
-              return
-            }
-            guard let jsonResponse = (try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers)) as? [AnyHashable: Any] else {
-              validationError = ReceiptValidationError.jsonResponseIsNotValid(description: "Unable to parse json")
-              semaphore.signal()
-              return
-            }
-            
-            dump(jsonResponse)
-            
-            guard let jsonReceiptData = jsonResponse["receipt"] as? [AnyHashable: Any] else {
-              return
-            }
-            
-            guard let originalPurchaseDate = jsonReceiptData["original_purchase_date_ms"] as? String else {
-              return
-            }
-            
-            guard let originalPurchaseDateTimeInterval = TimeInterval(originalPurchaseDate) else {
-              return
-            }
-            
-            dump(originalPurchaseDate)
-            
-            guard let originalAppVersion = jsonReceiptData["original_application_version"] as? String else {
-              return
-            }
-            
-            let shiftDate = Date(timeIntervalSince1970: (originalPurchaseDateTimeInterval / 1000.0))
-            
-            let calendar = Calendar.current
-
-            // Replace the hour (time) of both dates with 00:00
-            let date1 = calendar.startOfDay(for: Date())
-            let date2 = calendar.startOfDay(for: shiftDate)
-
-            let components = calendar.dateComponents([.day], from: date2, to: date1)
-            
-            guard let daysInUse = components.day else {
-              return
-            }
-            
-            self.daysInUse = daysInUse
-            self.initialAppVersion = originalAppVersion
-            
-            semaphore.signal()
-          }
-          task.resume()
-          
-          semaphore.wait()
-          
-          if let validationError = validationError {
-            throw validationError
-          }
-          
-          
-        } catch {
-          
-          print(error.localizedDescription)
-        }
+        let receiptString = receiptData.base64EncodedString(options: [])
+        
+        // Read receiptData
+        print(receiptString)
+        
+      } catch {
+        print("Couldn't read receipt data with error: " + error.localizedDescription)
       }
-    } catch {
-      // the receipt does not exist, start refreshing
-
-      print("error: \(error.localizedDescription)")
-      /*
-       error: The file “sandboxReceipt” couldn’t be opened because there is no such file
-       */
-      self.receiptRefreshRequest.start()
     }
+    
+    print("restore... \(productIdentifier)")
+    deliverPurchaseNotificationFor(identifier: productIdentifier)
+    SKPaymentQueue.default().finishTransaction(transaction)
   }
   
-  // MARK: SKRequestDelegate methods
-  func requestDidFinish(_ request: SKRequest) {
-    print("request finished successfully")
+  private func fail(transaction: SKPaymentTransaction) {
+    print("fail...")
+    if let transactionError = transaction.error as NSError?,
+       let localizedDescription = transaction.error?.localizedDescription,
+       transactionError.code != SKError.paymentCancelled.rawValue {
+      print("Transaction Error: \(localizedDescription)")
+      delegate?.didFail(with: localizedDescription)
+    }
+    
+    SKPaymentQueue.default().finishTransaction(transaction)
   }
   
-  func request(_ request: SKRequest, didFailWithError error: Error) {
-    print("request failed with error \(error.localizedDescription)")
+  private func deliverPurchaseNotificationFor(identifier: String?) {
+    guard let identifier = identifier else { return }
+    
+    purchasedProductIdentifiers.insert(identifier)
+    //        let defaults = UserDefaults(suiteName: Constants.appGroupsBundleID)!
+    //        defaults.set(true, forKey: StoreKitProducts.DataInsights)
+    
+    NotificationCenter.default.post(name: .IAPHelperPurchaseNotification, object: identifier)
   }
 }
 
-extension ReceiptFetcher: SKPaymentQueueDelegate {
-
-}
-
-extension ReceiptFetcher: SKPaymentTransactionObserver {
-  func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
-    print("\(#function)")
-  }
-}

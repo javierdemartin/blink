@@ -84,10 +84,17 @@
 {
   [super viewWillAppear:animated];
   
-  self.purchaseDateSatistics.text = [NSString stringWithFormat:@"You've used Blink for %ld days.", (long)ReceiptFetcher.shared.daysInUse];
+  ReceiptFetcher * receiptFetcher = [ReceiptFetcher sharedInstance];
   
-  if (![ReceiptFetcher.shared.initialAppVersion  isEqual: @""]) {
-    self.purchaseDateSatistics.text = [self.purchaseDateSatistics.text stringByAppendingString:[NSString stringWithFormat:@" Since version %@.", ReceiptFetcher.shared.initialAppVersion]];
+  if ([receiptFetcher daysInUse] != -1) {
+    self.purchaseDateSatistics.text = [NSString stringWithFormat:@"You've used Blink for %ld days.", (long)[receiptFetcher daysInUse]];
+    
+    if (![[receiptFetcher initialAppVersion] isEqual: @""]) {
+      self.purchaseDateSatistics.text = [self.purchaseDateSatistics.text stringByAppendingString:[NSString stringWithFormat:@" Since version %@.", [receiptFetcher initialAppVersion]]];
+    }
+    self.purchaseDateSatistics.hidden = false;
+  } else {
+    self.purchaseDateSatistics.hidden = true;
   }
   
   self.userNameLabel.text = [BKDefaults defaultUserName];;

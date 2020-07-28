@@ -1,0 +1,163 @@
+//////////////////////////////////////////////////////////////////////////////////
+//
+// B L I N K
+//
+// Copyright (C) 2016-2019 Blink Mobile Shell Project
+//
+// This file is part of Blink.
+//
+// Blink is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Blink is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Blink. If not, see <http://www.gnu.org/licenses/>.
+//
+// In addition, Blink is also subject to certain additional terms under
+// GNU GPL version 3 section 7.
+//
+// You should have received a copy of these additional terms immediately
+// following the terms and conditions of the GNU General Public License
+// which accompanied the Blink Source Code. If not, see
+// <http://www.github.com/blinksh/blink>.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+import Foundation
+import UIKit
+
+extension SuscriptionSettingsViewController: SuscriptionSettingsViewModelDelegate {
+  func didFinishStoreKitUpdateOperation() {
+    DispatchQueue.main.async {
+      self.tableView.reloadData()
+    }
+  }
+}
+
+class SuscriptionSettingsViewController: UITableViewController {
+  
+  let suscriptionViewModel: SuscriptionSettingsViewModel
+
+//  let cellsDescriptor =
+  
+  let cellsDescriptors = ["1": ["Restore purchases", "Read more"]]
+  
+  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    suscriptionViewModel = SuscriptionSettingsViewModel()
+    
+    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    
+    suscriptionViewModel.delegate = self
+  }
+  
+  required init?(coder: NSCoder) {
+    
+    suscriptionViewModel = SuscriptionSettingsViewModel()
+    
+    super.init(coder: coder)
+    
+    suscriptionViewModel.delegate = self
+
+  }
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+  }
+  
+  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    
+    switch section {
+    case 0:
+      return suscriptionViewModel.appStoreAvailableProducts.count
+    case 1:
+      return cellsDescriptors["1"]!.count
+    default:
+      return 0
+    }
+  }
+  
+  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    var cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+    
+    switch indexPath.section {
+    case 0:
+      
+      cell = UITableViewCell(style: .value1, reuseIdentifier: "Cell")
+      
+      guard let suscriptionPeriod = suscriptionViewModel.appStoreAvailableProducts[indexPath.row].subscriptionPeriod else {
+        return cell
+      }
+      
+      cell.textLabel?.text = suscriptionViewModel.appStoreAvailableProducts[indexPath.row].localizedTitle + " (\(suscriptionPeriod.unit.description(capitalizeFirstLetter: true, numberOfUnits: suscriptionPeriod.numberOfUnits)))"
+      
+      cell.detailTextLabel?.text = "\(suscriptionViewModel.appStoreAvailableProducts[indexPath.row].localizedPrice)"
+
+    case 1:
+      
+      guard let cellsContents = cellsDescriptors["\(1)"] else {
+        return cell
+      }
+      
+      cell.textLabel?.text = cellsContents[indexPath.row]
+    default:
+      return cell
+    }
+    
+    return cell
+  }
+  
+  override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+ 
+    switch section {
+    case 0:
+      return "Options"
+    case 1:
+      return "Status"
+    default:
+      return nil
+    }
+  }
+  
+  override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+    switch section {
+    case 0:
+      return "Blink shell suscriptions let you unlock the full potential of the app."
+    default:
+      return nil
+    }
+  }
+  
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+      
+    switch indexPath.section {
+    // Purchase section
+    case 0:
+      suscriptionViewModel.buy(product: suscriptionViewModel.appStoreAvailableProducts[indexPath.row])
+    case 1:
+      if indexPath.row == 0 {
+        NotificationCenter.default.addObserver(self, selector: #selector(didSuccessfullyFinishStoreKitOperation), name: .IAPHelperPurchaseNotification, object: nil)
+
+        StoreKitProducts.store.restorePurchases()
+      }
+      else if indexPath.row == 1 {
+        blink_openurl(URL(string: "https://blink.sh/suscriptions"))
+      }
+    default:
+      break
+    }
+  }
+  
+  @objc func didSuccessfullyFinishStoreKitOperation() {
+
+      print("FINISHED RESTORING")
+  }
+}
