@@ -38,6 +38,8 @@
 		22A9494C2067FD5E003A0666 /* tar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A9494A2067FD5E003A0666 /* tar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3352036EE87001FCC5C /* openssl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3332036EE86001FCC5C /* openssl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3362036EE87001FCC5C /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3342036EE86001FCC5C /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		80069D7D24D1691C0031A75A /* Calendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80069D7C24D1691C0031A75A /* Calendar.swift */; };
+		80069D7F24D1BA020031A75A /* Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80069D7E24D1BA020031A75A /* Formatter.swift */; };
 		80692ED324D02203006AB221 /* StoreKitProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80692ED224D02203006AB221 /* StoreKitProducts.swift */; };
 		80692EDB24D022AE006AB221 /* IAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80692EDA24D022AE006AB221 /* IAPHelper.swift */; };
 		80692EDD24D025A0006AB221 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80692EDC24D025A0006AB221 /* StoreKit.framework */; };
@@ -407,6 +409,8 @@
 		22A9494A2067FD5E003A0666 /* tar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tar.framework; sourceTree = "<group>"; };
 		22E1F3332036EE86001FCC5C /* openssl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openssl.framework; sourceTree = "<group>"; };
 		22E1F3342036EE86001FCC5C /* libssh2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libssh2.framework; sourceTree = "<group>"; };
+		80069D7C24D1691C0031A75A /* Calendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calendar.swift; sourceTree = "<group>"; };
+		80069D7E24D1BA020031A75A /* Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatter.swift; sourceTree = "<group>"; };
 		80692ED224D02203006AB221 /* StoreKitProducts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitProducts.swift; sourceTree = "<group>"; };
 		80692EDA24D022AE006AB221 /* IAPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPHelper.swift; sourceTree = "<group>"; };
 		80692EDC24D025A0006AB221 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -924,6 +928,15 @@
 			path = Sessions;
 			sourceTree = SOURCE_ROOT;
 		};
+		80069D7B24D169100031A75A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				80069D7C24D1691C0031A75A /* Calendar.swift */,
+				80069D7E24D1BA020031A75A /* Formatter.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		80BC25EE24C9DD1C00198E57 /* StoreKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -1394,6 +1407,7 @@
 		EA0BA1821C0CC57B00719C1A = {
 			isa = PBXGroup;
 			children = (
+				80069D7B24D169100031A75A /* Extensions */,
 				D2C243F7238E44960082C69C /* KB */,
 				C9B2E0031D6B612300B89F69 /* Settings */,
 				D265FBBB2317DD3C0017EAC4 /* BlinkTests */,
@@ -1714,6 +1728,7 @@
 				D2F330D420A6F1DF0074ADD7 /* clear.m in Sources */,
 				C94437571D8311960096F84E /* BKResource.m in Sources */,
 				D2CF27292428A791009885ED /* KBTracker.swift in Sources */,
+				80069D7F24D1BA020031A75A /* Formatter.swift in Sources */,
 				07F670771D05EEE200C0A53C /* SSHSession.m in Sources */,
 				D241CBD323040734003D64A5 /* KBSound.swift in Sources */,
 				D29619AF214FB5EA0070935A /* ssh-ecdsa.c in Sources */,
@@ -1774,6 +1789,7 @@
 				D2A90AE220D277E00073BF3D /* ssh.m in Sources */,
 				D241CBD223040734003D64A5 /* KBDevice.swift in Sources */,
 				D2334D1C21495DAE00D26AC3 /* udptunnel.m in Sources */,
+				80069D7D24D1691C0031A75A /* Calendar.swift in Sources */,
 				C9B2E0311D6B612400B89F69 /* BKDefaults.m in Sources */,
 				80BC25F624C9DD2A00198E57 /* ReceiptFetcher.swift in Sources */,
 				D296199A214F995D0070935A /* blocks.c in Sources */,

@@ -85,8 +85,6 @@ class SuscriptionSettingsViewModel {
 
             guard let products = products else { return }
 
-            NotificationCenter.default.addObserver(self, selector: #selector(self.didSuccessfullyFinishStoreKitOperation), name: .IAPHelperPurchaseNotification, object: nil)
-
 //            StoreKitProducts.store.buyProduct(foundProduct!)
         }
     })
@@ -116,10 +114,4 @@ extension SuscriptionSettingsViewModel: IAPHelperDelegate {
   func didFail(with error: String) {
     print(error)
   }
-//
-//  func previouslyPurchased(status: Bool) {
-//    print(status)
-//  }
-//
-  
 }

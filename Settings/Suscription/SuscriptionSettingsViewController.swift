@@ -47,7 +47,7 @@ class SuscriptionSettingsViewController: UITableViewController {
 
 //  let cellsDescriptor =
   
-  let cellsDescriptors = ["1": ["Restore purchases", "Read more"]]
+  let cellsDescriptors = ["1": ["Restore purchases", "Read more"], "2": ["Not currently suscribed"]]
   
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     suscriptionViewModel = SuscriptionSettingsViewModel()
@@ -80,6 +80,8 @@ class SuscriptionSettingsViewController: UITableViewController {
       return suscriptionViewModel.appStoreAvailableProducts.count
     case 1:
       return cellsDescriptors["1"]!.count
+    case 2:
+      return cellsDescriptors["2"]!.count
     default:
       return 0
     }
@@ -108,6 +110,11 @@ class SuscriptionSettingsViewController: UITableViewController {
       }
       
       cell.textLabel?.text = cellsContents[indexPath.row]
+    case 2:
+      
+      // Disable cell selection as it doesn't need to do any action
+      cell.selectionStyle = .none
+      cell.textLabel?.text = ReceiptFetcher.sharedInstance().currentSuscription
     default:
       return cell
     }
@@ -122,6 +129,8 @@ class SuscriptionSettingsViewController: UITableViewController {
       return "Options"
     case 1:
       return "Status"
+    case 2:
+      return "Current Suscription"
     default:
       return nil
     }
@@ -131,6 +140,14 @@ class SuscriptionSettingsViewController: UITableViewController {
     switch section {
     case 0:
       return "Blink shell suscriptions let you unlock the full potential of the app."
+    case 2:
+      var footerString = "To manage your suscriptions go to your account in the App Store and then tap on Suscriptions."
+      
+      if ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString.count > 0 {
+        footerString += " Current suscription expires on \(ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString), in \(Calendar.daysBetweenDates(startDate: Date(), endDate: ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDate)!) days."
+      }
+      
+      return footerString
     default:
       return nil
     }
@@ -144,8 +161,6 @@ class SuscriptionSettingsViewController: UITableViewController {
       suscriptionViewModel.buy(product: suscriptionViewModel.appStoreAvailableProducts[indexPath.row])
     case 1:
       if indexPath.row == 0 {
-        NotificationCenter.default.addObserver(self, selector: #selector(didSuccessfullyFinishStoreKitOperation), name: .IAPHelperPurchaseNotification, object: nil)
-
         StoreKitProducts.store.restorePurchases()
       }
       else if indexPath.row == 1 {

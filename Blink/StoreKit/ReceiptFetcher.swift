@@ -29,15 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
-//#if DEBUG
-//let urlString = "https://sandbox.itunes.apple.com/verifyReceipt"
-//#else
-//let urlString = "https://buy.itunes.apple.com/verifyReceipt"
-//#endif
-
-// https://fluffy.es/migrate-paid-app-to-iap/
-// https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html
+import StoreKit
 
 enum ReceiptValidationError: Error {
   case receiptNotFound
@@ -46,54 +38,65 @@ enum ReceiptValidationError: Error {
   case expired
 }
 
-struct ReceiptDataToShow {
+
+/**
+ Refreshes the local receipt.
+ */
+@objc class ReceiptFetcher : NSObject {
   
-  let originalPurchasedVersion: String
-  let daysInUse: Int
-}
-
-import StoreKit
-
-@objc
-class ReceiptFetcher : NSObject, SKRequestDelegate {
+  /**
+   Fetches the receipt if it's invalid or missing.
+   */
   let receiptRefreshRequest = SKReceiptRefreshRequest()
   
-  @objc static let shared = ReceiptFetcher()
+  @objc private static let _shared = ReceiptFetcher()
   private override init() {
-    //This prevents others from using the default '()' initializer for this class.
+    // Prevents others from using the default '()' initializer for this class.
     
     super.init()
-    // set delegate to self so when the receipt is retrieved,
-    // the delegate methods will be called
+    // SKRequestDelegate methods are called just when the
+    // receipt  is retrieved
     receiptRefreshRequest.delegate = self
     
     SKPaymentQueue.default().add(self)
-    
-//    fetchReceipt()
   }
   
   // sharedInstance class methoc can be reached from Objective-C
   @objc class func sharedInstance() -> ReceiptFetcher {
-    return shared
+    return _shared
   }
   
-  
+  /**
+   Number of days since initial purchase
+   */
   @objc public var daysInUse: Int = -1
+  
+  /**
+    Shown in `BKSettingsViewController` to show the user a detail of their current suscription purchased
+   */
+  @objc public var currentSuscription: String = "Not suscribed"
+  
+  @objc public var currentSuscriptionExpirationDateString: String = "" // Date(timeIntervalSince1970: 0)
+  @objc public var currentSuscriptionExpirationDate: Date = Date(timeIntervalSince1970: 0)
+  
+  /**
+   First app version that was acquired in the AppStore
+   */
   @objc var initialAppVersion: String = ""
   
-  
-  
   @objc func fetchReceipt() {
+    
+    // Locates the receipt and points to where it's located
     guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
-      print("unable to retrieve receipt url")
+      // No receipt was found.
       return
     }
     
     do {
-      // if the receipt does not exist, start refreshing
+      
       let reachable = try receiptUrl.checkResourceIsReachable()
       
-      // the receipt does not exist, start refreshing
+      // The receipt does not exist, start refreshing
       if reachable == false {
         receiptRefreshRequest.start()
       }
@@ -105,7 +108,9 @@ class ReceiptFetcher : NSObject, SKRequestDelegate {
           let receiptData = try! Data(contentsOf: receiptUrl, options: .alwaysMapped)
           let receiptString = receiptData.base64EncodedString()
           
-          let jsonObjectBody = ["receipt-data" : receiptString]
+//          let jsonObjectBody = ["receipt-data" : receiptString]
+          
+          let jsonObjectBody = ["receipt-data" : receiptString, "password": "APP_STORE_CONNECT_KEY"]
           
           //          #if DEBUG
           //          let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")!
@@ -113,7 +118,7 @@ class ReceiptFetcher : NSObject, SKRequestDelegate {
           //          let url = URL(string: "https://buy.itunes.apple.com/verifyReceipt")!
           //          #endif
           
-          let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")!
+          guard let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt") else { return }
           
           var request = URLRequest(url: url)
           request.httpMethod = "POST"
@@ -135,37 +140,72 @@ class ReceiptFetcher : NSObject, SKRequestDelegate {
               return
             }
             
+            /**
+             * Validation sends a `status: 21004` code if user is currently suscribed to an IAP and no App-Shared secret was provided in the URL request
+             */
             dump(jsonResponse)
             
+            if let latestReceiptInfo = jsonResponse["latest_receipt_info"] as? [[AnyHashable: Any]] {
+              
+              for purchase in latestReceiptInfo {
+//                dump(purchase)
+                
+                let expiresDateValue = Double(purchase["expires_date_ms"] as! String)! / 1000.0 //Double(purchase["expires_date_ms"]!) / 1000.0
+                let expiresDate = Date(timeIntervalSince1970: expiresDateValue)
+
+                
+//                print("Expires date \(purchase["expires_date"]) \(expiresDate)")
+//                print("Purchase date \(purchase["purchase_date"])")
+                print("Product ID \(purchase["product_id"])")
+                
+                if let expiresDate = Formatter.customDate.date(from: purchase["expires_date"] as! String) {
+//                    print(expiresDate)  // "2019-08-31 05:23:44 +0000\n"
+                    print("Expires Date \(expiresDate.description(with: .current))")  // "Saturday, August 31, 2019 at 2:28:44 AM Brasilia Standard Time\n"
+                }
+                
+                if Date() > expiresDate {
+                  print("❌")
+                } else {
+                  print("✅")
+                  self.currentSuscription = purchase["product_id"] as! String
+                  self.currentSuscriptionExpirationDate = expiresDate
+                  self.currentSuscriptionExpirationDateString = expiresDate.description(with: .current)
+                }
+                
+                if let purchaseDate = Formatter.customDate.date(from: purchase["purchase_date"] as! String) {
+//                    print(purchaseDate)  // "2019-08-31 05:23:44 +0000\n"
+                    print("Purchase Date \(purchaseDate.description(with: .current))")  // "Saturday, August 31, 2019 at 2:28:44 AM Brasilia Standard Time\n"
+                }
+                
+                print("---------------------")
+              }
+            }
+            
             guard let jsonReceiptData = jsonResponse["receipt"] as? [AnyHashable: Any] else {
+              semaphore.signal()
               return
             }
             
             guard let originalPurchaseDate = jsonReceiptData["original_purchase_date_ms"] as? String else {
+              semaphore.signal()
               return
             }
             
             guard let originalPurchaseDateTimeInterval = TimeInterval(originalPurchaseDate) else {
+              semaphore.signal()
               return
             }
             
             dump(originalPurchaseDate)
             
             guard let originalAppVersion = jsonReceiptData["original_application_version"] as? String else {
+              semaphore.signal()
               return
             }
             
             let shiftDate = Date(timeIntervalSince1970: (originalPurchaseDateTimeInterval / 1000.0))
             
-            let calendar = Calendar.current
-            
-            // Replace the hour (time) of both dates with 00:00
-            let date1 = calendar.startOfDay(for: Date())
-            let date2 = calendar.startOfDay(for: shiftDate)
-            
-            let components = calendar.dateComponents([.day], from: date2, to: date1)
-            
-            guard let daysInUse = components.day else {
+            guard let daysInUse = Calendar.daysBetweenDates(startDate: Date(), endDate: shiftDate) else {
               return
             }
             
@@ -174,6 +214,7 @@ class ReceiptFetcher : NSObject, SKRequestDelegate {
             
             semaphore.signal()
           }
+          
           task.resume()
           
           semaphore.wait()
@@ -182,24 +223,26 @@ class ReceiptFetcher : NSObject, SKRequestDelegate {
             throw validationError
           }
           
-          
         } catch {
-          
           print(error.localizedDescription)
         }
       }
     } catch {
-      // the receipt does not exist, start refreshing
-      
-      print("error: \(error.localizedDescription)")
-      /*
-       error: The file “sandboxReceipt” couldn’t be opened because there is no such file
-       */
+      /** The receipt doesn't exist, start the refresh process. If it's not present the error will be:
+       `error: The file “sandboxReceipt” couldn’t be opened because there is no such file`
+       */ 
+      print("Error: \(error.localizedDescription)")
       self.receiptRefreshRequest.start()
     }
   }
+}
+
+// MARK: SKRequestDelegate
+extension ReceiptFetcher: SKRequestDelegate {
   
-  // MARK: SKRequestDelegate methods
+  /**
+    `SKReceiptRefreshRequest` has finished
+   */
   func requestDidFinish(_ request: SKRequest) {
     print("request finished successfully")
   }
@@ -209,10 +252,7 @@ class ReceiptFetcher : NSObject, SKRequestDelegate {
   }
 }
 
-extension ReceiptFetcher: SKPaymentQueueDelegate {
-  
-}
-
+// MARK: SKPaymentTransactionObserver
 extension ReceiptFetcher: SKPaymentTransactionObserver {
   func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
     print("\(#function)")

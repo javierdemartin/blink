@@ -47,6 +47,7 @@
 @property (nonatomic, weak) IBOutlet UILabel *autoLockStatusLabel;
 @property (nonatomic, weak) IBOutlet UILabel *xCallbackStatusLabel;
 @property (nonatomic, weak) IBOutlet UILabel *versionLabel;
+@property (weak, nonatomic) IBOutlet UILabel *suscriptionStatusLabel;
 
 @end
 
@@ -102,6 +103,7 @@
   self.autoLockStatusLabel.text = [BKUserConfigurationManager userSettingsValueForKey:BKUserConfigAutoLock] ? @"On" : @"Off";
   self.xCallbackStatusLabel.text = [BKDefaults isXCallBackURLEnabled] ? @"On" : @"Off";
   self.versionLabel.text = [UIApplication blinkShortVersion];
+  self.suscriptionStatusLabel.text = [receiptFetcher currentSuscription];
   
   // Layout tableview so it will place labels correctly
   [self.tableView layoutIfNeeded];
