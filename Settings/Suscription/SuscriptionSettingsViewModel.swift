@@ -47,27 +47,6 @@ extension SKProduct {
     }
 }
 
-extension SKProduct.PeriodUnit {
-    func description(capitalizeFirstLetter: Bool = false, numberOfUnits: Int? = nil) -> String {
-        let period:String = {
-            switch self {
-            case .day: return "day"
-            case .week: return "week"
-            case .month: return "month"
-            case .year: return "year"
-            }
-        }()
-
-        var numUnits = ""
-        var plural = ""
-        if let numberOfUnits = numberOfUnits {
-            numUnits = "\(numberOfUnits) " // Add space for formatting
-            plural = numberOfUnits > 1 ? "s" : ""
-        }
-        return "\(numUnits)\(capitalizeFirstLetter ? period.capitalized : period)\(plural)"
-    }
-}
-
 class SuscriptionSettingsViewModel {
   
   var appStoreAvailableProducts: [SKProduct] = []
@@ -85,7 +64,6 @@ class SuscriptionSettingsViewModel {
 
             guard let products = products else { return }
 
-//            StoreKitProducts.store.buyProduct(foundProduct!)
         }
     })
   }
@@ -102,7 +80,7 @@ class SuscriptionSettingsViewModel {
 
 extension SuscriptionSettingsViewModel: IAPHelperDelegate {
   func finishedRestoringPurchases() {
-    
+    delegate?.didFinishStoreKitUpdateOperation()
   }
   
   func gotProductIdentifiersAndPricing(products: [SKProduct]) {

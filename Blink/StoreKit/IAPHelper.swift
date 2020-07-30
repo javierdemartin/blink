@@ -182,6 +182,15 @@ extension IAPHelper: SKPaymentTransactionObserver {
    */
   private func complete(transaction: SKPaymentTransaction) {
     SKPaymentQueue.default().finishTransaction(transaction)
+    
+    guard let receiptString = ReceiptFetcher.sharedInstance().fetchReceipt() else {
+      return
+    }
+    
+    ReceiptFetcher.sharedInstance().validate(receipt: receiptString, completion: {
+      self.delegate?.finishedRestoringPurchases()
+    })
+    
   }
   
   private func restore(transaction: SKPaymentTransaction) {
@@ -193,12 +202,16 @@ extension IAPHelper: SKPaymentTransactionObserver {
       
       do {
         let receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
-        print(receiptData)
+//        print(receiptData)
         
         let receiptString = receiptData.base64EncodedString(options: [])
         
         // Read receiptData
-        print(receiptString)
+//        print(receiptString)
+        
+        ReceiptFetcher.sharedInstance().validate(receipt: receiptString, completion: {
+          self.delegate?.finishedRestoringPurchases()
+        })
         
       } catch {
         print("Couldn't read receipt data with error: " + error.localizedDescription)

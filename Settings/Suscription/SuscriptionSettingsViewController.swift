@@ -44,9 +44,10 @@ extension SuscriptionSettingsViewController: SuscriptionSettingsViewModelDelegat
 class SuscriptionSettingsViewController: UITableViewController {
   
   let suscriptionViewModel: SuscriptionSettingsViewModel
-
-//  let cellsDescriptor =
   
+  let cellReuseIdentifier = "Cell"
+  
+  let cellReuseIdentifiers = ["0": "options", "1": "status", "2": "current-suscription"]
   let cellsDescriptors = ["1": ["Restore purchases", "Read more"], "2": ["Not currently suscribed"]]
   
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -77,6 +78,12 @@ class SuscriptionSettingsViewController: UITableViewController {
     
     switch section {
     case 0:
+      // If no products have already been retrieved from the App Store show a single cell
+      // acting as a loading state
+      if suscriptionViewModel.appStoreAvailableProducts.count == 0 {
+        return 1
+      }
+      
       return suscriptionViewModel.appStoreAvailableProducts.count
     case 1:
       return cellsDescriptors["1"]!.count
@@ -88,20 +95,28 @@ class SuscriptionSettingsViewController: UITableViewController {
   }
   
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    var cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+    var cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier, for: indexPath)
     
     switch indexPath.section {
     case 0:
       
-      cell = UITableViewCell(style: .value1, reuseIdentifier: "Cell")
+      if suscriptionViewModel.appStoreAvailableProducts.count == 0 {
+        cell = UITableViewCell(style: .default, reuseIdentifier: cellReuseIdentifiers["0"]!)
+        cell.textLabel?.text = "Loading..."
+        cell.selectionStyle = .none
+        
+        return cell
+      }
+      
+      cell = UITableViewCell(style: .value1, reuseIdentifier: cellReuseIdentifiers["0"]!)
       
       guard let suscriptionPeriod = suscriptionViewModel.appStoreAvailableProducts[indexPath.row].subscriptionPeriod else {
         return cell
       }
       
-      cell.textLabel?.text = suscriptionViewModel.appStoreAvailableProducts[indexPath.row].localizedTitle + " (\(suscriptionPeriod.unit.description(capitalizeFirstLetter: true, numberOfUnits: suscriptionPeriod.numberOfUnits)))"
+      cell.textLabel?.text = suscriptionViewModel.appStoreAvailableProducts[indexPath.row].localizedTitle
       
-      cell.detailTextLabel?.text = "\(suscriptionViewModel.appStoreAvailableProducts[indexPath.row].localizedPrice)"
+      cell.detailTextLabel?.text = "\(suscriptionViewModel.appStoreAvailableProducts[indexPath.row].localizedPrice) / \(suscriptionPeriod.unit.description(capitalizeFirstLetter: false, numberOfUnits: suscriptionPeriod.numberOfUnits))"
 
     case 1:
       
@@ -109,11 +124,14 @@ class SuscriptionSettingsViewController: UITableViewController {
         return cell
       }
       
+      cell = UITableViewCell(style: .default, reuseIdentifier: cellReuseIdentifiers["1"]!)
+            
       cell.textLabel?.text = cellsContents[indexPath.row]
     case 2:
       
       // Disable cell selection as it doesn't need to do any action
       cell.selectionStyle = .none
+      cell = UITableViewCell(style: .default, reuseIdentifier: cellReuseIdentifiers["2"]!)
       cell.textLabel?.text = ReceiptFetcher.sharedInstance().currentSuscription
     default:
       return cell
@@ -140,14 +158,18 @@ class SuscriptionSettingsViewController: UITableViewController {
     switch section {
     case 0:
       return "Blink shell suscriptions let you unlock the full potential of the app."
+    case 1:
+      return "To manage your suscriptions go to your account in the App Store and then tap on Suscriptions."
     case 2:
-      var footerString = "To manage your suscriptions go to your account in the App Store and then tap on Suscriptions."
       
       if ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString.count > 0 {
-        footerString += " Current suscription expires on \(ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString), in \(Calendar.daysBetweenDates(startDate: Date(), endDate: ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDate)!) days."
+        let footerString = "Current suscription expires on \(ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString), in \(ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDate)."
+        
+        return footerString
       }
       
-      return footerString
+      return nil
+      
     default:
       return nil
     }
@@ -158,7 +180,9 @@ class SuscriptionSettingsViewController: UITableViewController {
     switch indexPath.section {
     // Purchase section
     case 0:
-      suscriptionViewModel.buy(product: suscriptionViewModel.appStoreAvailableProducts[indexPath.row])
+      if suscriptionViewModel.appStoreAvailableProducts.count > 0 {
+        suscriptionViewModel.buy(product: suscriptionViewModel.appStoreAvailableProducts[indexPath.row])
+      }
     case 1:
       if indexPath.row == 0 {
         StoreKitProducts.store.restorePurchases()

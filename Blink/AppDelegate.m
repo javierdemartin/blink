@@ -89,7 +89,10 @@ void __setupProcessEnv() {
   // will be useful in the future to disable functions when the
   // suscription has ended
   receiptFetcher = [ReceiptFetcher sharedInstance];
-  [receiptFetcher fetchReceipt];
+  NSString *receiptString = [receiptFetcher fetchReceipt];
+  [receiptFetcher validateWithReceipt:receiptString completion:NULL];
+  
+  
   
   sideLoading = false; // Turn off extra commands from iOS system
   initializeEnvironment(); // initialize environment variables for iOS system

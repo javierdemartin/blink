@@ -53,4 +53,39 @@ extension Calendar {
     
     return daysInUse
   }
+  
+  /**
+   Given two dates return the number of days between them
+   
+   - Returns: `Int` value with the days between dates
+   */
+  static func dateIntervalBetweenDates(startDate: Date, endDate: Date) -> String? {
+
+      let calendar = Calendar.current
+
+      let components = calendar.dateComponents([.day, .hour, .minute], from: endDate, to: startDate)
+
+      guard let daysInUse = components.day else {
+          return nil
+      }
+
+      if daysInUse == 0 {
+          guard let hours = components.hour else {
+              return nil
+          }
+
+          if hours == 0 {
+              guard let minutes = components.minute else {
+                  return nil
+              }
+
+              return "\(minutes) minutes"
+
+          }
+
+          return "\(hours) hours"
+      }
+
+      return "\(daysInUse) days"
+  }
 }

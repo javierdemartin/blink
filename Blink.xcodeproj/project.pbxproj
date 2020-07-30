@@ -40,6 +40,7 @@
 		22E1F3362036EE87001FCC5C /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3342036EE86001FCC5C /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		80069D7D24D1691C0031A75A /* Calendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80069D7C24D1691C0031A75A /* Calendar.swift */; };
 		80069D7F24D1BA020031A75A /* Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80069D7E24D1BA020031A75A /* Formatter.swift */; };
+		80069D8424D2B0C00031A75A /* SKProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80069D8324D2B0C00031A75A /* SKProduct.swift */; };
 		80692ED324D02203006AB221 /* StoreKitProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80692ED224D02203006AB221 /* StoreKitProducts.swift */; };
 		80692EDB24D022AE006AB221 /* IAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80692EDA24D022AE006AB221 /* IAPHelper.swift */; };
 		80692EDD24D025A0006AB221 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 80692EDC24D025A0006AB221 /* StoreKit.framework */; };
@@ -411,6 +412,7 @@
 		22E1F3342036EE86001FCC5C /* libssh2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libssh2.framework; sourceTree = "<group>"; };
 		80069D7C24D1691C0031A75A /* Calendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calendar.swift; sourceTree = "<group>"; };
 		80069D7E24D1BA020031A75A /* Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatter.swift; sourceTree = "<group>"; };
+		80069D8324D2B0C00031A75A /* SKProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKProduct.swift; sourceTree = "<group>"; };
 		80692ED224D02203006AB221 /* StoreKitProducts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitProducts.swift; sourceTree = "<group>"; };
 		80692EDA24D022AE006AB221 /* IAPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPHelper.swift; sourceTree = "<group>"; };
 		80692EDC24D025A0006AB221 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -933,6 +935,7 @@
 			children = (
 				80069D7C24D1691C0031A75A /* Calendar.swift */,
 				80069D7E24D1BA020031A75A /* Formatter.swift */,
+				80069D8324D2B0C00031A75A /* SKProduct.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1818,6 +1821,7 @@
 				C9B2E0341D6B612400B89F69 /* BKTheme.m in Sources */,
 				D29619A7214FA7D40070935A /* bcrypt-pbkdf.c in Sources */,
 				D241CBD123040734003D64A5 /* KBKeyViewArrows.swift in Sources */,
+				80069D8424D2B0C00031A75A /* SKProduct.swift in Sources */,
 				C989E5671D6CC95A003E0079 /* BKPubKeyViewController.m in Sources */,
 				D2334D1D21495DAE00D26AC3 /* host2ip.c in Sources */,
 				D2C24415238E44AB0082C69C /* KeyCode.swift in Sources */,

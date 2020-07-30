@@ -77,19 +77,19 @@ enum ReceiptValidationError: Error {
   @objc public var currentSuscription: String = "Not suscribed"
   
   @objc public var currentSuscriptionExpirationDateString: String = "" // Date(timeIntervalSince1970: 0)
-  @objc public var currentSuscriptionExpirationDate: Date = Date(timeIntervalSince1970: 0)
+  @objc public var currentSuscriptionExpirationDate: String = "" //Date(timeIntervalSince1970: 0)
   
   /**
    First app version that was acquired in the AppStore
    */
   @objc var initialAppVersion: String = ""
   
-  @objc func fetchReceipt() {
+  @objc func fetchReceipt() -> String? {
     
     // Locates the receipt and points to where it's located
     guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
       // No receipt was found.
-      return
+      return nil
     }
     
     do {
@@ -105,123 +105,12 @@ enum ReceiptValidationError: Error {
         
         do {
           
-          let receiptData = try! Data(contentsOf: receiptUrl, options: .alwaysMapped)
+          let receiptData = try Data(contentsOf: receiptUrl, options: .alwaysMapped)
           let receiptString = receiptData.base64EncodedString()
           
-//          let jsonObjectBody = ["receipt-data" : receiptString]
+          return receiptString
           
-          let jsonObjectBody = ["receipt-data" : receiptString, "password": "APP_STORE_CONNECT_KEY"]
           
-          //          #if DEBUG
-          //          let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")!
-          //          #else
-          //          let url = URL(string: "https://buy.itunes.apple.com/verifyReceipt")!
-          //          #endif
-          
-          guard let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt") else { return }
-          
-          var request = URLRequest(url: url)
-          request.httpMethod = "POST"
-          request.httpBody = try! JSONSerialization.data(withJSONObject: jsonObjectBody, options: .prettyPrinted)
-          
-          let semaphore = DispatchSemaphore(value: 0)
-          
-          var validationError : ReceiptValidationError?
-          
-          let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, let httpResponse = response as? HTTPURLResponse, error == nil, httpResponse.statusCode == 200 else {
-              validationError = ReceiptValidationError.jsonResponseIsNotValid(description: error?.localizedDescription ?? "")
-              semaphore.signal()
-              return
-            }
-            guard let jsonResponse = (try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers)) as? [AnyHashable: Any] else {
-              validationError = ReceiptValidationError.jsonResponseIsNotValid(description: "Unable to parse json")
-              semaphore.signal()
-              return
-            }
-            
-            /**
-             * Validation sends a `status: 21004` code if user is currently suscribed to an IAP and no App-Shared secret was provided in the URL request
-             */
-            dump(jsonResponse)
-            
-            if let latestReceiptInfo = jsonResponse["latest_receipt_info"] as? [[AnyHashable: Any]] {
-              
-              for purchase in latestReceiptInfo {
-//                dump(purchase)
-                
-                let expiresDateValue = Double(purchase["expires_date_ms"] as! String)! / 1000.0 //Double(purchase["expires_date_ms"]!) / 1000.0
-                let expiresDate = Date(timeIntervalSince1970: expiresDateValue)
-
-                
-//                print("Expires date \(purchase["expires_date"]) \(expiresDate)")
-//                print("Purchase date \(purchase["purchase_date"])")
-                print("Product ID \(purchase["product_id"])")
-                
-                if let expiresDate = Formatter.customDate.date(from: purchase["expires_date"] as! String) {
-//                    print(expiresDate)  // "2019-08-31 05:23:44 +0000\n"
-                    print("Expires Date \(expiresDate.description(with: .current))")  // "Saturday, August 31, 2019 at 2:28:44 AM Brasilia Standard Time\n"
-                }
-                
-                if Date() > expiresDate {
-                  print("❌")
-                } else {
-                  print("✅")
-                  self.currentSuscription = purchase["product_id"] as! String
-                  self.currentSuscriptionExpirationDate = expiresDate
-                  self.currentSuscriptionExpirationDateString = expiresDate.description(with: .current)
-                }
-                
-                if let purchaseDate = Formatter.customDate.date(from: purchase["purchase_date"] as! String) {
-//                    print(purchaseDate)  // "2019-08-31 05:23:44 +0000\n"
-                    print("Purchase Date \(purchaseDate.description(with: .current))")  // "Saturday, August 31, 2019 at 2:28:44 AM Brasilia Standard Time\n"
-                }
-                
-                print("---------------------")
-              }
-            }
-            
-            guard let jsonReceiptData = jsonResponse["receipt"] as? [AnyHashable: Any] else {
-              semaphore.signal()
-              return
-            }
-            
-            guard let originalPurchaseDate = jsonReceiptData["original_purchase_date_ms"] as? String else {
-              semaphore.signal()
-              return
-            }
-            
-            guard let originalPurchaseDateTimeInterval = TimeInterval(originalPurchaseDate) else {
-              semaphore.signal()
-              return
-            }
-            
-            dump(originalPurchaseDate)
-            
-            guard let originalAppVersion = jsonReceiptData["original_application_version"] as? String else {
-              semaphore.signal()
-              return
-            }
-            
-            let shiftDate = Date(timeIntervalSince1970: (originalPurchaseDateTimeInterval / 1000.0))
-            
-            guard let daysInUse = Calendar.daysBetweenDates(startDate: Date(), endDate: shiftDate) else {
-              return
-            }
-            
-            self.daysInUse = daysInUse
-            self.initialAppVersion = originalAppVersion
-            
-            semaphore.signal()
-          }
-          
-          task.resume()
-          
-          semaphore.wait()
-          
-          if let validationError = validationError {
-            throw validationError
-          }
           
         } catch {
           print(error.localizedDescription)
@@ -233,6 +122,115 @@ enum ReceiptValidationError: Error {
        */ 
       print("Error: \(error.localizedDescription)")
       self.receiptRefreshRequest.start()
+    }
+    
+    return nil
+  }
+  
+  @objc func validate(receipt: String, completion: (() -> Void)? = nil) {
+    
+    do {
+      
+      //          let jsonObjectBody = ["receipt-data" : receiptString]
+      
+      let jsonObjectBody = ["receipt-data" : receipt, "password": "APP_STORE_CONNECT_KEY", "exclude-old-transactions": "true"]
+      
+      //          #if DEBUG
+      //          let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")!
+      //          #else
+      //          let url = URL(string: "https://buy.itunes.apple.com/verifyReceipt")!
+      //          #endif
+      
+      guard let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt") else { return }
+      
+      var request = URLRequest(url: url)
+      request.httpMethod = "POST"
+      request.httpBody = try! JSONSerialization.data(withJSONObject: jsonObjectBody, options: .prettyPrinted)
+      
+      let semaphore = DispatchSemaphore(value: 0)
+      
+      var validationError : ReceiptValidationError?
+      
+      let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        guard let data = data, let httpResponse = response as? HTTPURLResponse, error == nil, httpResponse.statusCode == 200 else {
+          validationError = ReceiptValidationError.jsonResponseIsNotValid(description: error?.localizedDescription ?? "")
+          semaphore.signal()
+          return
+        }
+        
+        guard let jsonResponse = (try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers)) as? [AnyHashable: Any] else {
+          validationError = ReceiptValidationError.jsonResponseIsNotValid(description: "Unable to parse json")
+          semaphore.signal()
+          return
+        }
+        
+        /**
+         * Validation sends a `status: 21004` code if user is currently suscribed to an IAP and no App-Shared secret was provided in the URL request
+         */
+        guard let status = jsonResponse["status"] as? Int else { return }
+                
+        if let latestReceiptInfo = jsonResponse["latest_receipt_info"] as? [[AnyHashable: Any]] {
+          
+          for purchase in latestReceiptInfo {
+            
+            let expiresDateValue = Double(purchase["expires_date_ms"] as! String)! / 1000.0
+            let expiresDate = Date(timeIntervalSince1970: expiresDateValue)
+            
+            if Date() > expiresDate {
+              // No active suscription
+            } else {
+              // Active suscription
+              self.currentSuscription = purchase["product_id"] as! String
+              self.currentSuscriptionExpirationDate = "\(Calendar.dateIntervalBetweenDates(startDate: expiresDate, endDate: Date())!)"
+              self.currentSuscriptionExpirationDateString = expiresDate.description(with: .current)
+            }
+          }
+        }
+        
+        guard let jsonReceiptData = jsonResponse["receipt"] as? [AnyHashable: Any] else {
+          semaphore.signal()
+          return
+        }
+        
+        guard let originalPurchaseDate = jsonReceiptData["original_purchase_date_ms"] as? String else {
+          semaphore.signal()
+          return
+        }
+        
+        guard let originalPurchaseDateTimeInterval = TimeInterval(originalPurchaseDate) else {
+          semaphore.signal()
+          return
+        }
+        
+        guard let originalAppVersion = jsonReceiptData["original_application_version"] as? String else {
+          semaphore.signal()
+          return
+        }
+        
+        let shiftDate = Date(timeIntervalSince1970: (originalPurchaseDateTimeInterval / 1000.0))
+        
+        guard let daysInUse = Calendar.daysBetweenDates(startDate: Date(), endDate: shiftDate) else {
+          return
+        }
+        
+        self.daysInUse = daysInUse
+        self.initialAppVersion = originalAppVersion
+        
+        semaphore.signal()
+        
+        completion?()
+      }
+      
+      task.resume()
+      
+      semaphore.wait()
+      
+      if let validationError = validationError {
+        throw validationError
+      }
+      
+    } catch {
+      
     }
   }
 }
