@@ -36,12 +36,22 @@ public struct StoreKitProducts {
 
   public static let FirstSuscriptionLevel = "Com.CarlosCabanero.BlinkShell.suscription_level_1"
   public static let SecondSuscriptionLevel = "Com.CarlosCabanero.BlinkShell.suscription_level_2"
+//  public static let MonthlyTier = "Com.CarlosCabanero.BlinkShell.MonthlyTier"
 
+  /**
+   Set of `ProductIdentifier` with the same name as they are listed in App Store Connect. The initial part `com.xxx.` has to match the app's
+   BundleID registered in App Store Connect.
+   */
   private static let productIdentifiers: Set<ProductIdentifier> = [StoreKitProducts.FirstSuscriptionLevel, StoreKitProducts.SecondSuscriptionLevel]
 
   public static let store = IAPHelper(productIds: StoreKitProducts.productIdentifiers)
 }
 
+/**
+ Returns the last component of the `ProductIdentifier` that identifies the In App Purchase.
+ 
+ - Returns: `String` containing the last of the comopnents of the `ProductIdentifier` itself.
+ */
 func resourceNameForProductIdentifier(_ productIdentifier: String) -> String? {
   return productIdentifier.components(separatedBy: ".").last
 }

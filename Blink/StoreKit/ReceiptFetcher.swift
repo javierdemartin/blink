@@ -79,6 +79,8 @@ enum ReceiptValidationError: Error {
   @objc public var currentSuscriptionExpirationDateString: String = "" // Date(timeIntervalSince1970: 0)
   @objc public var currentSuscriptionExpirationDate: String = "" //Date(timeIntervalSince1970: 0)
   
+  @objc public var hasBoughtOgBlink = false
+  
   /**
    First app version that was acquired in the AppStore
    */
@@ -127,32 +129,42 @@ enum ReceiptValidationError: Error {
     return nil
   }
   
+  /**
+   Validates the receipt against the server
+   - Parameters:
+    - receipt: Base64 encoded receipt read from the device
+    - completion: `(() -> Void)? = nil` Optional, needed only if you need to perform an operation later when the receipt has been validated against the server.
+   */
   @objc func validate(receipt: String, completion: (() -> Void)? = nil) {
     
     do {
       
-      //          let jsonObjectBody = ["receipt-data" : receiptString]
+      let jsonObjectBody = ["receipt-data" : receipt]
       
-      let jsonObjectBody = ["receipt-data" : receipt, "password": "APP_STORE_CONNECT_KEY", "exclude-old-transactions": "true"]
-      
-      //          #if DEBUG
-      //          let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt")!
-      //          #else
-      //          let url = URL(string: "https://buy.itunes.apple.com/verifyReceipt")!
-      //          #endif
-      
-      guard let url = URL(string: "https://sandbox.itunes.apple.com/verifyReceipt") else { return }
+      guard let url = URL(string: "http://192.168.86.25:8080/validateReceipt") else { return }
       
       var request = URLRequest(url: url)
       request.httpMethod = "POST"
-      request.httpBody = try! JSONSerialization.data(withJSONObject: jsonObjectBody, options: .prettyPrinted)
+      
+      do {
+        request.httpBody = try JSONSerialization.data(withJSONObject: jsonObjectBody, options: .prettyPrinted)
+      } catch let error {
+        print(error.localizedDescription)
+      }
+      
+      request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+      request.addValue("application/json", forHTTPHeaderField: "Accept")
       
       let semaphore = DispatchSemaphore(value: 0)
       
       var validationError : ReceiptValidationError?
       
       let task = URLSession.shared.dataTask(with: request) { data, response, error in
-        guard let data = data, let httpResponse = response as? HTTPURLResponse, error == nil, httpResponse.statusCode == 200 else {
+        guard let data = data,
+              let httpResponse = response as? HTTPURLResponse,
+              error == nil,
+              httpResponse.statusCode == 200
+        else {
           validationError = ReceiptValidationError.jsonResponseIsNotValid(description: error?.localizedDescription ?? "")
           semaphore.signal()
           return
@@ -186,6 +198,8 @@ enum ReceiptValidationError: Error {
             }
           }
         }
+        
+        self.localReceiptValidation()
         
         guard let jsonReceiptData = jsonResponse["receipt"] as? [AnyHashable: Any] else {
           semaphore.signal()
@@ -230,8 +244,22 @@ enum ReceiptValidationError: Error {
       }
       
     } catch {
-      
+      print(error.localizedDescription)
     }
+  }
+  
+  /**
+   Perform local data validation for the receipt.
+   */
+  func localReceiptValidation(jsonResponse: [AnyHashable: Any]) {
+    
+    guard let jsonReceiptData = jsonResponse["receipt"] as? [AnyHashable: Any] else {
+      semaphore.signal()
+      return
+    }
+    
+    
+    
   }
 }
 

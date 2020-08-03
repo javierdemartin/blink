@@ -100,15 +100,20 @@ class SuscriptionSettingsViewController: UITableViewController {
     switch indexPath.section {
     case 0:
       
+      guard let caseIdentifier = cellReuseIdentifiers["\(indexPath.section)"] else {
+        return cell
+      }
+      
       if suscriptionViewModel.appStoreAvailableProducts.count == 0 {
-        cell = UITableViewCell(style: .default, reuseIdentifier: cellReuseIdentifiers["0"]!)
+        
+        cell = UITableViewCell(style: .default, reuseIdentifier: caseIdentifier)
         cell.textLabel?.text = "Loading..."
         cell.selectionStyle = .none
         
         return cell
       }
       
-      cell = UITableViewCell(style: .value1, reuseIdentifier: cellReuseIdentifiers["0"]!)
+      cell = UITableViewCell(style: .value1, reuseIdentifier: caseIdentifier)
       
       guard let suscriptionPeriod = suscriptionViewModel.appStoreAvailableProducts[indexPath.row].subscriptionPeriod else {
         return cell
@@ -120,18 +125,26 @@ class SuscriptionSettingsViewController: UITableViewController {
 
     case 1:
       
-      guard let cellsContents = cellsDescriptors["\(1)"] else {
+      guard let cellsContents = cellsDescriptors["1"] else {
         return cell
       }
       
-      cell = UITableViewCell(style: .default, reuseIdentifier: cellReuseIdentifiers["1"]!)
+      guard let caseIdentifier = cellReuseIdentifiers["\(indexPath.section)"] else {
+        return cell
+      }
+      
+      cell = UITableViewCell(style: .default, reuseIdentifier: caseIdentifier)
             
       cell.textLabel?.text = cellsContents[indexPath.row]
     case 2:
       
+      guard let caseIdentifier = cellReuseIdentifiers["\(indexPath.section)"] else {
+        return cell
+      }
+      
       // Disable cell selection as it doesn't need to do any action
       cell.selectionStyle = .none
-      cell = UITableViewCell(style: .default, reuseIdentifier: cellReuseIdentifiers["2"]!)
+      cell = UITableViewCell(style: .default, reuseIdentifier: caseIdentifier)
       cell.textLabel?.text = ReceiptFetcher.sharedInstance().currentSuscription
     default:
       return cell
@@ -161,8 +174,9 @@ class SuscriptionSettingsViewController: UITableViewController {
     case 1:
       return "To manage your suscriptions go to your account in the App Store and then tap on Suscriptions."
     case 2:
-      
-      if ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString.count > 0 {
+      if ReceiptFetcher.sharedInstance().hasBoughtOgBlink {
+        return "You already have Blink 13, thank you for your support."
+      } else if ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString.count > 0 {
         let footerString = "Current suscription expires on \(ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDateString), in \(ReceiptFetcher.sharedInstance().currentSuscriptionExpirationDate)."
         
         return footerString

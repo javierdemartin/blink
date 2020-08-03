@@ -41,6 +41,7 @@ extension SKProduct.PeriodUnit {
             case .week: return "week"
             case .month: return "month"
             case .year: return "year"
+            default: return ""
             }
         }()
 

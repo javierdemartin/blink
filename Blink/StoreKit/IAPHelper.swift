@@ -64,12 +64,41 @@ open class IAPHelper: NSObject {
     productIdentifiers = productIds
     super.init()
     
+    DispatchQueue.main.async {
+      if self.hasOgBlinkInstalled() {
+        ReceiptFetcher.sharedInstance().hasBoughtOgBlink = true
+      }
+    }
+    
     SKPaymentQueue.default().add(self)
+  }
+  
+  /**
+   Check if the user is has the original paid version. The original app version enables a new URL scheme that's the same as the BundleID
+   
+   - Returns: `Bool` indicating if the original paid version is installed on device
+   */
+  func hasOgBlinkInstalled() -> Bool {
+    
+    let appScheme = "Com.CarlosCabanero.BlinkShell://app"
+    
+    guard let appUrlScheme = URL(string: appScheme) else {
+      return false
+    }
+    
+    if UIApplication.shared.canOpenURL(appUrlScheme) {
+      return true
+    }
+    
+    return false
   }
 }
 
 extension IAPHelper: SKRequestDelegate {
   
+  /**
+   
+   */
   public func requestDidFinish(_ request: SKRequest) {
     dump(request)
   }
@@ -78,6 +107,9 @@ extension IAPHelper: SKRequestDelegate {
 // MARK: - StoreKit API
 extension IAPHelper {
   
+  /**
+   Retrieve localized information from the App Store about the list of available In App Purchases
+   */
   public func requestProducts(_ completionHandler: @escaping ProductsRequestCompletionHandler) {
     productsRequest?.cancel()
     productsRequestCompletionHandler = completionHandler
@@ -95,6 +127,11 @@ extension IAPHelper {
     SKPaymentQueue.default().add(payment)
   }
   
+  /**
+   Check if the device has payment restirictions like for example being limited for a kid
+   
+   - Returns: `Bool` Indicating if the device has purchase restrictions
+   */
   public class func canMakePayments() -> Bool {
     return SKPaymentQueue.canMakePayments()
   }
@@ -132,11 +169,15 @@ extension IAPHelper: SKProductsRequestDelegate {
     // Contains all of the available In App Purchases listed in App Store Connect
     let products = response.products
     productsRequestCompletionHandler?(true, products)
+    
     clearRequestAndHandler()
     
     delegate?.gotProductIdentifiersAndPricing(products: products)
   }
   
+  /**
+   
+   */
   public func request(_ request: SKRequest, didFailWithError error: Error) {
     print("Failed to load list of products.")
     print("Error: \(error.localizedDescription)")
