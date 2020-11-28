@@ -44,6 +44,10 @@ document.addEventListener('selectionchange', function() {
   _postMessage('selectionchange', term_getCurrentSelection());
 });
 
+//document.addEventListener('interestingSpots', function() {
+//  _postMessage('interestingSpots', term_interestingSpots());
+//});
+
 hterm.Terminal.IO.prototype.sendString = function(string) {
   _postMessage('sendString', {string});
 };
@@ -539,4 +543,19 @@ function term_restore() {
   t.primaryScreen_.textAttributes.reset();
   t.setVTScrollRegion(null, null);
   t.setCursorVisible(true);
+}
+
+function _interestinigSpotsInText(text) {
+var result = [];
+//    var httpLinkRegex = /https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+var httpLinkRegex = /https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}(\.[a-zA-Z0-9()]{1,6})?\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?(:\d{1,4})?/gi;
+let links = text.match(httpLinkRegex);
+    if (links) {
+  result = [...result, ...links.map(url => ({url, kind: 'url'}))];
+  }
+    return result;
+}
+
+function term_interestingSpots() {
+    return _interestinigSpotsInText(t.scrollPort_._renderDom.innerText);
 }

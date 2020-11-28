@@ -62,8 +62,11 @@ enum Command: String, Codable, CaseIterable {
   case selectionStackOverflow
   case selectionShare
   case configShow
+  case openDashboard
+  case openSessionsCarrousel
   
   var title: String {
+    
     switch self {
     case .windowNew:              return "New Window"
     case .windowClose:            return "Close Window"
@@ -97,6 +100,8 @@ enum Command: String, Codable, CaseIterable {
     case .selectionStackOverflow: return "StackOverflow Selection"
     case .selectionShare:         return "Share Selection"
     case .configShow:             return "Show Config"
+    case .openDashboard:          return "Open Dashboard"
+    case .openSessionsCarrousel: return "Open Sessions Carrousel"
     }
   }
 }

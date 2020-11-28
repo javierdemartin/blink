@@ -140,6 +140,11 @@ NSString *__iCloudsDriveDocumentsPath = nil;
   return [[self blink] stringByAppendingPathComponent:@"hosts"];
 }
 
++ (NSString *)blinkPortForwardingRules
+{
+  return [[self blink] stringByAppendingPathComponent:@"portForwardingRules"];
+}
+
 + (NSString *)blinkSyncItemsFile
 {
   return [[self blink] stringByAppendingPathComponent:@"syncItems"];

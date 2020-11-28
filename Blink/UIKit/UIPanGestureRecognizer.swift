@@ -1,8 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 //
 // B L I N K
 //
-// Copyright (C) 2016-2018 Blink Mobile Shell Project
+// Copyright (C) 2016-2019 Blink Mobile Shell Project
 //
 // This file is part of Blink.
 //
@@ -29,35 +29,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 
-@interface BlinkPaths : NSObject
+import Foundation
 
+extension UIPanGestureRecognizer {
+  
+  var direction: PanDirection? {
+          let velocity = self.velocity(in: view)
+          let isVertical = abs(velocity.y) > abs(velocity.x)
+          switch (isVertical, velocity.x, velocity.y) {
+          case (true, _, let y) where y < 0: return .up
+          case (true, _, let y) where y > 0: return .down
+          case (false, let x, _) where x > 0: return .right
+          case (false, let x, _) where x < 0: return .left
+          default: return nil
+          }
+      }
+}
 
-+ (NSString *) documents;
-+ (NSURL *) documentsURL;
-
-+ (NSString *) iCloudDriveDocuments;
-
-// ~/.blink
-+ (NSString *) blink;
-// ~/.ssh
-+ (NSString *) ssh;
-
-+ (NSURL *) blinkURL;
-+ (NSString *)blinkKeysFile;
-+ (NSString *)blinkHostsFile;
-+ (NSString *)blinkPortForwardingRules;
-+ (NSString *)blinkSyncItemsFile;
-+ (NSString *)blinkProfileFile;
-+ (NSURL *)blinkKBConfigURL;
-
-+ (NSString *) historyFile;
-+ (NSURL *)historyURL;
-+ (NSString *) knownHostsFile;
-+ (NSString *) defaultsFile;
-
-+ (void)linkICloudDriveIfNeeded;
-
-
-@end
+enum PanDirection: String {
+  case left
+  case right
+  case unknown
+  case up
+  case down
+}

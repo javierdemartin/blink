@@ -98,6 +98,8 @@
 - (void)focus;
 - (void)reportTouchInPoint:(CGPoint)point;
 - (void)cleanSelection;
+//- (void)getInterestingLinks;
+- (void)getInterestingLinks:(void(^)(NSArray *result))handler;
 - (void)increaseFontSize;
 - (void)decreaseFontSize;
 - (void)resetFontSize;

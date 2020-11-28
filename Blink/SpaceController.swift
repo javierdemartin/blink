@@ -29,10 +29,89 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// TODO: Re-draw when appears
 
 import MBProgressHUD
+import SwiftUI
+import UIKit
+import Combine
+
+class SessionsCarrouselViewController: UIHostingController<AnyView> {
+  required init?(coder: NSCoder) {
+    
+    super.init(coder: coder)
+  }
+  
+  init(rootView: AnyView, environmentSettings: DashboardBrain) {
+    let listView = rootView.environmentObject(environmentSettings)
+    super.init(rootView: AnyView(listView))
+  }
+  
+  override init(rootView: AnyView) {
+    
+    let listView = rootView.environmentObject(DashboardBrain())
+    super.init(rootView: AnyView(listView))
+  }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+}
 
 class SpaceController: UIViewController {
+  
+  var cancellableBag: Set<AnyCancellable> = []
+  
+  lazy var dashboardBrain = DashboardBrain()
+  
+  private lazy var bottomLeftStackView: UIStackView = {
+    
+    let stackView = UIStackView(arrangedSubviews: [dashboardHostingController.view, terminalsCarrousel.view])
+    stackView.alignment = UIStackView.Alignment.leading
+    stackView.axis = NSLayoutConstraint.Axis.vertical
+    stackView.isHidden = false
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+    
+    return stackView
+  }()
+  
+  lazy var dashboardHostingController: SessionsCarrouselViewController = {
+    let viewController = SessionsCarrouselViewController(rootView: AnyView(BKDashboard()), environmentSettings: dashboardBrain)
+    viewController.view.translatesAutoresizingMaskIntoConstraints = false
+    viewController.view.backgroundColor = UIColor.clear
+    
+    return viewController
+  }()
+  
+  var common = LongProcessesView()
+  
+//  lazy var commonActionsHostingController: UIHostingController<CommonActions> = {
+  lazy var commonActionsHostingController: SessionsCarrouselViewController = {
+    
+    let hostingController = SessionsCarrouselViewController(rootView: AnyView(LongProcessesView()), environmentSettings: dashboardBrain)
+    hostingController.view.backgroundColor = UIColor.clear
+    hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+    return hostingController
+  }()
+
+  /**
+   Hosts all of the open terminals and the shortcut to open a new tab
+   */
+  lazy var terminalsCarrousel: SessionsCarrouselViewController = {
+    let viewController = SessionsCarrouselViewController(rootView: AnyView(TerminalsCarrousel()), environmentSettings: dashboardBrain)
+    viewController.view.translatesAutoresizingMaskIntoConstraints = false
+    viewController.view.backgroundColor = UIColor.clear
+    
+    return viewController
+  }()
+
+  
+  var initialBottomLeftPosition = CGPoint()  // The initial center point of the view.
+  var initialVerticalBottomLeftPosition = CGPoint()  // The initial center point of the view.
+  var initialTopRightPosition = CGPoint()
+  var translatedBottomLeftPosition = CGPoint()
+  var translatedVerticalBottomLeftPosition = CGPoint()
+  var translatedTopRightPosition = CGPoint()
   
   struct UIState: UserActivityCodable {
     var keys: [UUID] = []
@@ -108,6 +187,48 @@ class SpaceController: UIViewController {
     
     _setupAppearance()
     
+    dashboardBrain.dashboardAction.sink(receiveValue: { a in
+        
+      switch a {
+      
+      case .newTab:
+        self.newShellAction()
+      case .enableGeoLock:
+        break
+      case .stopGeoLock:
+        break
+      case .geoLock:
+        if GeoManager.shared().traking {
+          GeoManager.shared().stop()
+          
+          self.dashboardBrain.dashboardConsecuence.send(.geoLockStatus(status: "Stop"))
+        } else {
+          GeoManager.shared().start()
+          GeoManager.shared().lock(inDistance: 200)
+          self.dashboardBrain.dashboardConsecuence.send(.geoLockStatus(status: "Start (200 m)"))
+        }
+      case .iterateScreenMode:
+        
+        var layoutMode = BKDefaults.layoutMode().rawValue
+        
+        if layoutMode != BKLayoutMode.safeFit.rawValue {
+          layoutMode += 1
+        } else {
+          layoutMode = 0
+        }
+        
+        BKDefaults.setLayoutMode(BKLayoutMode(rawValue: layoutMode)!)
+        BKDefaults.save()
+        
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: BKAppearanceChanged), object: self)
+        
+        self.common.settings.dashboardConsecuence.send(.screenMode(status: ScreenAppearanceTranslator(rawValue: layoutMode)!.description))
+      case .pasteOnTerm(text: let contents):
+        self.currentTerm()?.termDevice.write(contents)
+      }
+      
+    }).store(in: &cancellableBag)
+    
     view.isOpaque = true
     
     _viewportsController.view.isOpaque = true
@@ -142,13 +263,56 @@ class SpaceController: UIViewController {
       _viewportsController.setViewControllers([term], direction: .forward, animated: false)
     }
     
+    let hideGesture = UIPanGestureRecognizer(target: self, action: #selector(handleDashboardGesture(_:)))
+    bottomLeftStackView.addGestureRecognizer(hideGesture)
+    
+    let guide = view.safeAreaLayoutGuide
+    
+    view.addSubview(commonActionsHostingController.view)
+    addChild(commonActionsHostingController)
+    view.addSubview(bottomLeftStackView)
+      
+    NSLayoutConstraint.activate([
+      commonActionsHostingController.view.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+      bottomLeftStackView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
+      bottomLeftStackView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+      bottomLeftStackView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
+    ])
+    
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      
+      
+      NSLayoutConstraint.activate([
+        commonActionsHostingController.view.topAnchor.constraint(equalTo: guide.topAnchor)
+      ])
+    }
+
+    /// UI layout specific constraints for iPhones
+    else if UIDevice.current.userInterfaceIdiom == .phone {
+
+      /// Stack up the layout vertically
+      NSLayoutConstraint.activate([
+        commonActionsHostingController.view.bottomAnchor.constraint(equalTo: bottomLeftStackView.topAnchor)
+      ])
+    }
+    
+    dashboardHostingController.view.frame = view.bounds
+    commonActionsHostingController.view.frame = view.bounds
+    terminalsCarrousel.view.frame = view.bounds
+    bottomLeftStackView.frame = view.bounds
+    
+    /// Hide the Dashboard on first appearance
+//    showDashboardProgramatically()
   }
   
+  
+
 
   public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
     if view.window?.isKeyWindow == true {
       DispatchQueue.main.async {
+        
 //        self.currentTerm()?.termDevice.view?.webView?.kbView.reset()
 //        SmarterTermInput.shared.contentView()?.reloadInputViews()
       }
@@ -306,6 +470,9 @@ class SpaceController: UIViewController {
     currentTerm()?.termDevice
   }
   
+  /**
+   Triggered on: terminal resize, shell move, shell creation, remove current term
+   */
   private func _displayHUD() {
     _hud?.hide(animated: false)
     
@@ -357,6 +524,9 @@ class SpaceController: UIViewController {
     
     view.window?.windowScene?.title = sceneTitle
     _commandsHUD.updateHUD()
+    
+    // Triggered on each terminal screen to detect possible new links to interact with
+    getInterestingLinks()
   }
   
 }
@@ -522,6 +692,7 @@ extension SpaceController {
     }
 
     switch cmd {
+//    case .openDashboard: showDashboard()
     case .configShow: showConfigAction()
     case .tab1: _moveToShell(idx: 0)
     case .tab2: _moveToShell(idx: 1)
@@ -554,6 +725,8 @@ extension SpaceController {
     case .zoomIn: currentTerm()?.termDevice.view?.increaseFontSize()
     case .zoomOut: currentTerm()?.termDevice.view?.decreaseFontSize()
     case .zoomReset: currentTerm()?.termDevice.view?.resetFontSize()
+    case .openDashboard: showDashboardProgramatically()
+    case .openSessionsCarrousel: showSessionsCarrouselProgramatically()
     }
   }
   
@@ -823,7 +996,6 @@ extension SpaceController {
     
     _moveToShell(idx: by > 0 ? 0 : _viewportsKeys.count - 1, animated: animated)
   }
-  
 }
 
 extension SpaceController: CommandsHUDViewDelegate {
@@ -835,4 +1007,273 @@ extension SpaceController: CommandsHUDViewDelegate {
   }
   
   @objc func spaceController() -> SpaceController? { self }
+}
+
+// MARK: Dashboard
+
+/**
+ Manage dashboard gestures
+ */
+extension SpaceController {
+  
+  /**
+   Executed when the `KeyBindingAction.openSessionsCarrousel` keyboard shortcut is invoked.
+   
+   If the Dashboard is hidden when hitting the keyboard shortcut it's also needed to bring it into view and then show the Carrousel
+   */
+  @objc func showSessionsCarrouselProgramatically() {
+    
+    /// Dashboard UIStackView is hidden
+    if self.bottomLeftStackView.isHidden {
+      
+      /// Bring up to view the UIStackView not caring if the Terminal Carrousel is hidden
+      showDashboardProgramatically()
+      
+      /// If the Terminal Carrousel is hidden animate its appearance
+      if self.terminalsCarrousel.view.isHidden {
+        /// View is about to appear
+        self.terminalsCarrousel.view.fadeIn(0.15, onCompletion: {
+          self.bottomLeftStackView.layoutIfNeeded()
+        })
+      }
+    }
+    
+    /// Dashboard UIStackView is visible, animate the appearance of the Terminal Carrousel
+    else {
+      if self.terminalsCarrousel.view.isHidden {
+        /// View is about to appear
+        self.terminalsCarrousel.view.fadeIn(0.15, onCompletion: {
+          self.bottomLeftStackView.layoutIfNeeded()
+        })
+      } else {
+        /// View is about to be hidden
+        self.terminalsCarrousel.view.fadeOut(0.15, onCompletion: {
+          self.bottomLeftStackView.layoutIfNeeded()
+        })
+      }
+    }
+  }
+  
+  /**
+   Runs `term_interestingSpots()` from `term.js` through `TermView.m`.
+   
+   Called whenever a tab comes on/goes scope to display intersting links. The obtained URLs are
+   */
+  func getInterestingLinks() {
+    self.currentTerm()?.termDevice.view?.getInterestingLinks({ result in
+      
+      guard let result = result else { return }
+      
+      let detectedUrls: [String] = Array(Set((result.compactMap({ $0 as? NSDictionary }).compactMap { $0["url"] as? String }))).reversed()
+
+      // Publish changes on main thread
+      DispatchQueue.main.async {
+        self.dashboardBrain.urls = detectedUrls
+      }
+    })
+  }
+  
+  /**
+   Executed when the `KeyBindingAction.openDashboard` keyboard shortcut is invoked
+   */
+  @objc func showDashboardProgramatically() {
+    
+    self.view.layer.removeAllAnimations()
+    self.bottomLeftStackView.layer.removeAllAnimations()
+    self.commonActionsHostingController.view.layer.removeAllAnimations()
+    
+    // Animate the appearing/disappearing of the view with some springiness added to it
+    UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseIn, animations: {
+      if self.bottomLeftStackView.isHidden {
+        
+        self.getInterestingLinks()
+        
+        self.bottomLeftStackView.center.x = self.bottomLeftStackView.frame.size.width/2
+        self.commonActionsHostingController.view.center.x = self.view.frame.width - self.commonActionsHostingController.view.frame.width / 2
+        self.bottomLeftStackView.fadeIn()
+        
+        self.commonActionsHostingController.view.fadeIn()
+      } else {
+        self.bottomLeftStackView.center.x = -1 * self.bottomLeftStackView.frame.size.width/2
+        self.commonActionsHostingController.view.center.x = self.view.frame.width + self.commonActionsHostingController.view.frame.width / 2
+        self.bottomLeftStackView.fadeOut(0.15, onCompletion: {
+          self.bottomLeftStackView.layoutIfNeeded()
+        })
+        self.commonActionsHostingController.view.fadeOut(0.15, onCompletion: {
+          self.commonActionsHostingController.view.layoutIfNeeded()
+        })
+      }
+    })
+  }
+  
+  /**
+   Gesture recognizer to move out the "Blink Dashboard" hidden from the left side into view. Called from `WKWebView` and handled here.
+   */
+  @objc private func handleDashboardGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+    
+    guard let panDirection = gestureRecognizer.direction else { return }
+    
+    if panDirection == .left || panDirection == .right {
+      
+      /// If the UIStackView is already on screen and the user tries to drag it
+      /// to the right side cancel the gesture as it's already on screen
+      if bottomLeftStackView.alpha == 1 && panDirection == .right { return }
+      
+      switch gestureRecognizer.state {
+      case .began:
+        
+        /// As views are out of screen they've been hidden, before animating their appearance unhide them
+        bottomLeftStackView.isHidden = false
+        commonActionsHostingController.view.isHidden = false
+        
+        getInterestingLinks()
+        
+        initialBottomLeftPosition.x = bottomLeftStackView.frame.origin.x
+        initialTopRightPosition = commonActionsHostingController.view.frame.origin
+      case .ended:
+        
+        var finalBottomLeftSnapPosition = CGPoint(x: translatedBottomLeftPosition.x, y: initialBottomLeftPosition.y)
+        var finalTopRightSnapPosition = CGPoint(x: translatedTopRightPosition.x, y: initialTopRightPosition.y)
+        
+        /// View is about to show up, bringing it from the left side
+        if translatedBottomLeftPosition.x > initialBottomLeftPosition.x {
+          
+          finalBottomLeftSnapPosition.x = 0.0
+          finalTopRightSnapPosition.x = view.frame.width - 1 * commonActionsHostingController.view.frame.width
+          
+          // Animate the appearing/disappearing of the view with some springiness added to it
+          UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.4, options: .curveEaseOut, animations: {
+            self.bottomLeftStackView.frame.origin.x = finalBottomLeftSnapPosition.x
+            self.commonActionsHostingController.view.frame.origin.x = finalTopRightSnapPosition.x
+            self.bottomLeftStackView.fadeIn()
+            self.commonActionsHostingController.view.fadeIn()
+          })
+        }
+        /// View is about to be hidden
+        else if panDirection == .left {
+          
+          finalBottomLeftSnapPosition.x = -1 * dashboardHostingController.view.frame.width
+          finalTopRightSnapPosition.x = self.view.frame.width
+                                          + commonActionsHostingController.view.frame.width
+          
+          // Animate the appearance/disappearance of the view with some springiness added to it
+          UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.4, options: .curveEaseIn, animations: {
+            self.bottomLeftStackView.frame.origin.x = finalBottomLeftSnapPosition.x
+            self.commonActionsHostingController.view.frame.origin.x = finalTopRightSnapPosition.x
+            self.bottomLeftStackView.fadeOut()
+            self.commonActionsHostingController.view.fadeOut()
+          })
+        }
+        
+      case .changed:
+        
+        /// Progressivelly increase alpha when the view is hidden so the appearance is progressivelly smooth
+        var alphaPercentage = abs(gestureRecognizer.translation(in: self.view).x / bottomLeftStackView.frame.width)
+        
+        /// When dragging leftwards alpha decreases from 1 to 0
+        if panDirection == .left {
+          alphaPercentage = 1 - alphaPercentage
+        }
+        
+        translatedBottomLeftPosition.x = initialBottomLeftPosition.x
+                                          + gestureRecognizer.translation(in: self.view).x
+        translatedTopRightPosition.x = initialTopRightPosition.x
+                                        - gestureRecognizer.translation(in: self.view).x * alphaPercentage
+        
+        bottomLeftStackView.frame.origin.x = translatedBottomLeftPosition.x
+        commonActionsHostingController.view.frame.origin.x = translatedTopRightPosition.x
+        
+      default:
+        break
+      }
+    }
+    /// Handle the dragging gestures for the terminals carrousel
+    else if panDirection == .up || panDirection == .down {
+      
+      /// If the terminal carrousel is already open and the detected gesture is upwards don't move the view
+      /// and cancel the action
+      if panDirection == .up && !terminalsCarrousel.view.isHidden { return }
+      
+      switch gestureRecognizer.state {
+      case .began:
+        initialVerticalBottomLeftPosition = self.bottomLeftStackView.center
+        
+      /// Match the ending position depending on the gesture the user has done
+      case .ended:
+        
+        if panDirection == .down {
+          /// Swipe down gesture
+          self.terminalsCarrousel.view.fadeOut(0.15, onCompletion: {
+            self.bottomLeftStackView.layoutIfNeeded()
+            self.terminalsCarrousel.view.layoutIfNeeded()
+          })
+          
+        }  else {
+          /// Swipe up gesture
+          self.terminalsCarrousel.view.fadeIn(0.15, onCompletion: {
+            self.bottomLeftStackView.layoutIfNeeded()
+            self.terminalsCarrousel.view.layoutIfNeeded()
+          })
+        }
+        
+      /// Follow the finger's movement when the gesture is active
+      case .changed:
+        
+        // If pan direction is downwards start changing the apha
+        var alphaPercentage = abs(gestureRecognizer.translation(in: self.view).y / terminalsCarrousel.view.frame.height)
+        
+        if terminalsCarrousel.view.frame.height == 0 && panDirection == .down {
+          alphaPercentage = 1
+        } else if terminalsCarrousel.view.frame.height == 0 && panDirection == .up {
+          alphaPercentage = 0
+        }
+        
+        if panDirection == .down {
+          /// Progressivelly increase the alpha when the view is appearing
+          terminalsCarrousel.view.alpha = 1 - alphaPercentage
+        } else {
+          /// Progressivelly increase the alpha when the view is appearing
+          terminalsCarrousel.view.alpha = alphaPercentage
+        }
+        
+        /// When following the finger down the alpha is decreasing, once it reaches the threshold of `0.1` hide the view finishing the interaction
+        if terminalsCarrousel.view.alpha <= 0.1 && panDirection == .down {
+          terminalsCarrousel.view.isHidden = true
+        }
+        
+        /// Translated movement is only the initial position plus the recognized gesture
+        translatedVerticalBottomLeftPosition.y = initialVerticalBottomLeftPosition.y
+                                                  + gestureRecognizer.translation(in: view).y
+        
+        
+        bottomLeftStackView.center.y = translatedVerticalBottomLeftPosition.y
+        
+      default: break
+      }
+    }
+  }
+}
+
+extension UIView {
+  /// Animate the appearance of an `UIView`
+  func fadeIn(_ duration: TimeInterval? = 0.2, onCompletion: (() -> Void)? = nil) {
+    self.alpha = 0
+    self.isHidden = false
+    UIView.animate(withDuration: duration!,
+                   animations: { self.alpha = 1 },
+                   completion: { (value: Bool) in
+                    if let complete = onCompletion { complete() }
+                   })
+  }
+  
+  /// Animate the disappearance of an `UIView`
+  func fadeOut(_ duration: TimeInterval? = 0.2, onCompletion: (() -> Void)? = nil) {
+    UIView.animate(withDuration: duration!,
+                   animations: { self.alpha = 0 },
+                   completion: { (value: Bool) in
+                    self.isHidden = true
+                    if let complete = onCompletion { complete() }
+                   })
+  }
+  
 }

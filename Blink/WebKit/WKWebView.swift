@@ -97,6 +97,7 @@ class UIScrollViewWithoutHitTest: UIScrollView {
   private let _2fTapRecognizer = UITapGestureRecognizer()
   private let _pinchRecognizer = UIPinchGestureRecognizer()
   private let _3fTapRecognizer = UITapGestureRecognizer()
+  private let _dashboardRecognizer = UIScreenEdgePanGestureRecognizer()
   private let _longPressRecognizer = UILongPressGestureRecognizer()
   private let _hoverRecognizer = UIHoverGestureRecognizer()
   private var _characterSize: CGSize? = nil
@@ -127,6 +128,7 @@ class UIScrollViewWithoutHitTest: UIScrollView {
       _1fTapRecognizer,
       _2fTapRecognizer,
       _3fTapRecognizer,
+      _dashboardRecognizer,
       _pinchRecognizer,
       _longPressRecognizer,
       _scrollView.panGestureRecognizer,
@@ -200,6 +202,10 @@ class UIScrollViewWithoutHitTest: UIScrollView {
     _3fTapRecognizer.numberOfTapsRequired = 1
     _3fTapRecognizer.numberOfTouchesRequired = 3
     _3fTapRecognizer.delegate = self
+    
+    _dashboardRecognizer.delegate = self
+    _dashboardRecognizer.edges = .left
+    _dashboardRecognizer.addTarget(self, action: #selector(_onDashboardSwipe(_:)))
     
     _longPressRecognizer.delegate = self
     
@@ -282,6 +288,18 @@ class UIScrollViewWithoutHitTest: UIScrollView {
     }
   }
   
+  @objc private func _onDashboardSwipe(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
+    
+    if let target = _wkWebView?.target(forAction: #selector(handleDashboardGesture(_:)), withSender: gestureRecognizer) as? UIResponder {
+      target.perform(#selector(handleDashboardGesture(_:)), with: gestureRecognizer)
+    }
+  }
+  
+  /**
+   Handled in `SpaceController`
+   */
+  @objc private func handleDashboardGesture(_ gestureRecognizer: UIPanGestureRecognizer) { }
+  
   @objc func _onHover(_ recognizer: UIHoverGestureRecognizer) {
     switch recognizer.state {
     case .began, .changed:
@@ -307,6 +325,20 @@ class UIScrollViewWithoutHitTest: UIScrollView {
 extension WKWebViewGesturesInteraction: UIGestureRecognizerDelegate {
   func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
     return true
+  }
+  
+  /**
+   Needed to prioritize the open dashboard gesture from the left edge over the swipe between terminals gesture.
+   
+   If not implemented both gestures are executed at the same tiem and when opening the dashboard the pan gesture it's also triggered and switches between terminals.
+   */
+  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    
+    if gestureRecognizer == _dashboardRecognizer {
+      return true
+    }
+    
+    return false
   }
 }
 

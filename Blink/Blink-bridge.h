@@ -44,5 +44,11 @@
 #import "TermDevice.h"
 #import "KBWebViewBase.h"
 #import "openurl.h"
+#import "BKPubKey.h"
+#import "BKHosts.h"
+#import "GeoManager.h"
+
+// MOSH
+#include "libmoshios/moshiosbridge.h"
 
 #endif /* Blink_bridge_h */

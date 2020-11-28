@@ -178,6 +178,10 @@ NSString *term_apiResponse(NSString *name, NSString *response) {
   return  [NSString stringWithFormat:@"term_apiResponse(%@, %@);", _encodeString(name), _encodeString(response)];
 }
 
+NSString *term_interestingSpots() {
+  return @"term_interestingSpots();";
+}
+
 
 NSString *term_restore() {
   return @"term_restore();";

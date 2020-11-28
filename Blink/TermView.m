@@ -232,6 +232,27 @@ struct winsize __winSizeFromJSON(NSDictionary *json) {
   [self _evalJSScript:term_restore()];
 }
 
+/// Detect
+- (void)getInterestingLinks:(void(^)(NSArray *result))handler {
+  
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [_webView evaluateJavaScript:term_interestingSpots() completionHandler:^(id result, NSError *error) {
+      dispatch_async(_jsQueue, ^{
+        if (error != nil) {
+          return;
+        }
+        
+        NSMutableArray *b = result;
+        
+        handler(b);
+        
+      });
+    }];
+  });
+  
+  
+}
+
 - (void)increaseFontSize
 {
   [_webView evaluateJavaScript:term_increaseFontSize() completionHandler:nil];
@@ -353,6 +374,8 @@ struct winsize __winSizeFromJSON(NSDictionary *json) {
     [_device viewAPICall:data[@"name"] andJSONRequest:data[@"request"]];
   } else if ([operation isEqualToString:@"notify"]) {
     [_device viewNotify:data];
+  } else if ([operation isEqualToString:@"interestingSpots"]) {
+    NSLog(data);
   } else if ([operation isEqualToString:@"ring-bell"]) {
     [_device viewDidReceiveBellRing];
     
