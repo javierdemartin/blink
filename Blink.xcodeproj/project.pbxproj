@@ -38,6 +38,7 @@
 		22A9494C2067FD5E003A0666 /* tar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A9494A2067FD5E003A0666 /* tar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3352036EE87001FCC5C /* openssl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3332036EE86001FCC5C /* openssl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3362036EE87001FCC5C /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3342036EE86001FCC5C /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		805CA651257679B100D50B47 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805CA650257679B100D50B47 /* Color.swift */; };
 		80D2442F25728D0F0097793A /* BKDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2442E25728D0F0097793A /* BKDashboard.swift */; };
 		80D2443425728DA60097793A /* UIPanGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */; };
 		80D2443925728E280097793A /* PortForwardingRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443825728E280097793A /* PortForwardingRulesView.swift */; };
@@ -414,6 +415,7 @@
 		22A9494A2067FD5E003A0666 /* tar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tar.framework; sourceTree = "<group>"; };
 		22E1F3332036EE86001FCC5C /* openssl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openssl.framework; sourceTree = "<group>"; };
 		22E1F3342036EE86001FCC5C /* libssh2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libssh2.framework; sourceTree = "<group>"; };
+		805CA650257679B100D50B47 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		80D2442E25728D0F0097793A /* BKDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKDashboard.swift; sourceTree = "<group>"; };
 		80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPanGestureRecognizer.swift; sourceTree = "<group>"; };
 		80D2443825728E280097793A /* PortForwardingRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortForwardingRulesView.swift; sourceTree = "<group>"; };
@@ -740,6 +742,7 @@
 		0716B5231CFFAB9300268B5B /* Blink */ = {
 			isa = PBXGroup;
 			children = (
+				805CA6602577F7C900D50B47 /* SwiftUI */,
 				D215AC282335218E00E164C3 /* WebKit */,
 				D265FBC7231904B50017EAC4 /* Foundation */,
 				D2A52225231304A90010AC04 /* UIKit */,
@@ -928,6 +931,14 @@
 			);
 			path = Sessions;
 			sourceTree = SOURCE_ROOT;
+		};
+		805CA6602577F7C900D50B47 /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				805CA650257679B100D50B47 /* Color.swift */,
+			);
+			path = SwiftUI;
+			sourceTree = "<group>";
 		};
 		80D2442425728D000097793A /* Dashboard */ = {
 			isa = PBXGroup;
@@ -1821,6 +1832,7 @@
 				C989E54C1D6CC488003E0079 /* BKPredictionViewController.m in Sources */,
 				D248E67622DDDF130057FE67 /* UIStateRestorable.swift in Sources */,
 				C9B2E0341D6B612400B89F69 /* BKTheme.m in Sources */,
+				805CA651257679B100D50B47 /* Color.swift in Sources */,
 				D29619A7214FA7D40070935A /* bcrypt-pbkdf.c in Sources */,
 				D241CBD123040734003D64A5 /* KBKeyViewArrows.swift in Sources */,
 				C989E5671D6CC95A003E0079 /* BKPubKeyViewController.m in Sources */,

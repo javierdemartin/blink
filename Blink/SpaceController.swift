@@ -36,28 +36,6 @@ import SwiftUI
 import UIKit
 import Combine
 
-class SessionsCarrouselViewController: UIHostingController<AnyView> {
-  required init?(coder: NSCoder) {
-    
-    super.init(coder: coder)
-  }
-  
-  init(rootView: AnyView, environmentSettings: DashboardBrain) {
-    let listView = rootView.environmentObject(environmentSettings)
-    super.init(rootView: AnyView(listView))
-  }
-  
-  override init(rootView: AnyView) {
-    
-    let listView = rootView.environmentObject(DashboardBrain())
-    super.init(rootView: AnyView(listView))
-  }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-}
-
 class SpaceController: UIViewController {
   
   var cancellableBag: Set<AnyCancellable> = []
@@ -75,20 +53,17 @@ class SpaceController: UIViewController {
     return stackView
   }()
   
-  lazy var dashboardHostingController: SessionsCarrouselViewController = {
-    let viewController = SessionsCarrouselViewController(rootView: AnyView(BKDashboard()), environmentSettings: dashboardBrain)
+  lazy var dashboardHostingController: SwiftUIHostingController = {
+    let viewController = SwiftUIHostingController(rootView: AnyView(BKDashboard()), environmentSettings: dashboardBrain)
     viewController.view.translatesAutoresizingMaskIntoConstraints = false
     viewController.view.backgroundColor = UIColor.clear
     
     return viewController
   }()
   
-  var common = LongProcessesView()
-  
-//  lazy var commonActionsHostingController: UIHostingController<CommonActions> = {
-  lazy var commonActionsHostingController: SessionsCarrouselViewController = {
+  lazy var commonActionsHostingController: SwiftUIHostingController = {
     
-    let hostingController = SessionsCarrouselViewController(rootView: AnyView(LongProcessesView()), environmentSettings: dashboardBrain)
+    let hostingController = SwiftUIHostingController(rootView: AnyView(LongProcessesView()), environmentSettings: dashboardBrain)
     hostingController.view.backgroundColor = UIColor.clear
     hostingController.view.translatesAutoresizingMaskIntoConstraints = false
     return hostingController
@@ -97,8 +72,8 @@ class SpaceController: UIViewController {
   /**
    Hosts all of the open terminals and the shortcut to open a new tab
    */
-  lazy var terminalsCarrousel: SessionsCarrouselViewController = {
-    let viewController = SessionsCarrouselViewController(rootView: AnyView(TerminalsCarrousel()), environmentSettings: dashboardBrain)
+  lazy var terminalsCarrousel: SwiftUIHostingController = {
+    let viewController = SwiftUIHostingController(rootView: AnyView(TerminalsCarrousel()), environmentSettings: dashboardBrain)
     viewController.view.translatesAutoresizingMaskIntoConstraints = false
     viewController.view.backgroundColor = UIColor.clear
     
@@ -129,9 +104,27 @@ class SpaceController: UIViewController {
   
   var sceneRole: UISceneSession.Role = UISceneSession.Role.windowApplication
   
-  private var _viewportsKeys = [UUID]()
+  /**
+   Terminal tabs are identified by `UUID`
+   */
+  private var _viewportsKeys = [UUID]() {
+    didSet {
+      dashboardBrain.numberOfActiveSessions = _viewportsKeys
+    }
+  }
+  
   private var _termControllers: Set<TermController> = Set()
-  private var _currentKey: UUID? = nil
+  
+  private var _currentKey: UUID? = nil {
+    didSet {
+      if let _currentKey = _currentKey {
+        
+        let term: TermController = SessionRegistry.shared[_currentKey]
+        
+        dashboardBrain.dashboardConsecuence.send(.setActiveTerm(byId: _currentKey))
+      }
+    }
+  }
   
   private var _hud: MBProgressHUD? = nil
   private let _commandsHUD = CommandsHUGView(frame: .zero)
@@ -140,6 +133,9 @@ class SpaceController: UIViewController {
   private var _spaceControllerAnimating: Bool = false
   var stuckKeyCode: KeyCode? = nil
   
+  /**
+   The view has laid out its subviews. Called every time the view is updated, rotated or changed or it's **bounds change**.
+   */
   public override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     
@@ -222,9 +218,29 @@ class SpaceController: UIViewController {
         
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: BKAppearanceChanged), object: self)
         
-        self.common.settings.dashboardConsecuence.send(.screenMode(status: ScreenAppearanceTranslator(rawValue: layoutMode)!.description))
+        self.dashboardBrain.dashboardConsecuence.send(.screenMode(status: ScreenAppearanceTranslator(rawValue: layoutMode)!.description))
       case .pasteOnTerm(text: let contents):
         self.currentTerm()?.termDevice.write(contents)
+      case .moveTo(term: let term):
+        self._moveToShell(key: term, animated: true)
+      case .reorderedTerms(current: let key, ids: let ids):
+        
+        self._viewportsKeys = ids
+        self._currentKey = key
+        
+        /**
+         Force `UIPageViewController` to forget about cached view controllers of neighboring pages that
+         are currently not being displayed.
+         
+         After re-setting the `dataSource` both `pageViewController(_:viewControllerBefore:)` and `pageViewController(_:viewControllerAfter:)`
+         will be called again to restore the state.
+         
+         https://developer.apple.com/documentation/uikit/uipageviewcontrollerdatasource
+         */
+        DispatchQueue.main.async() {
+          self._viewportsController.dataSource = nil
+          self._viewportsController.dataSource = self
+        }
       }
       
     }).store(in: &cancellableBag)
@@ -268,6 +284,11 @@ class SpaceController: UIViewController {
     
     let guide = view.safeAreaLayoutGuide
     
+    dashboardHostingController.view.frame = view.bounds
+    commonActionsHostingController.view.frame = view.bounds
+    terminalsCarrousel.view.frame = view.bounds
+    bottomLeftStackView.frame = view.bounds
+    
     view.addSubview(commonActionsHostingController.view)
     addChild(commonActionsHostingController)
     view.addSubview(bottomLeftStackView)
@@ -276,7 +297,9 @@ class SpaceController: UIViewController {
       commonActionsHostingController.view.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
       bottomLeftStackView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
       bottomLeftStackView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
-      bottomLeftStackView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
+      bottomLeftStackView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+      /// Pin the right-most part of the Terminal carrousel to the UIStackView that contains it
+      terminalsCarrousel.view.trailingAnchor.constraint(equalTo: bottomLeftStackView.trailingAnchor)
     ])
     
     if UIDevice.current.userInterfaceIdiom == .pad {
@@ -296,18 +319,10 @@ class SpaceController: UIViewController {
       ])
     }
     
-    dashboardHostingController.view.frame = view.bounds
-    commonActionsHostingController.view.frame = view.bounds
-    terminalsCarrousel.view.frame = view.bounds
-    bottomLeftStackView.frame = view.bounds
-    
     /// Hide the Dashboard on first appearance
-//    showDashboardProgramatically()
+    showDashboardProgramatically()
   }
   
-  
-
-
   public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
     if view.window?.isKeyWindow == true {
@@ -1228,11 +1243,12 @@ extension SpaceController {
           alphaPercentage = 0
         }
         
-        if panDirection == .down {
-          /// Progressivelly increase the alpha when the view is appearing
+        /// Progressivelly follow the finger down/up when hiding/showing the carrousel.
+        if translatedVerticalBottomLeftPosition.y > initialVerticalBottomLeftPosition.y {
+          /// Increase the alpha when the view is appearing
           terminalsCarrousel.view.alpha = 1 - alphaPercentage
         } else {
-          /// Progressivelly increase the alpha when the view is appearing
+          /// Increase the alpha when the view is appearing
           terminalsCarrousel.view.alpha = alphaPercentage
         }
         
