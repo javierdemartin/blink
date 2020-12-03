@@ -115,6 +115,11 @@ class SpaceController: UIViewController {
   
   private var _termControllers: Set<TermController> = Set()
   
+  /**
+   Keeps track of the `UUID` that identifies the active Terminal Session.
+   
+   On every change it notifies the `BKDashboard` using the `DashboardBrain`'s publisher `BKDashboardAction`
+   */
   private var _currentKey: UUID? = nil {
     didSet {
       if let _currentKey = _currentKey {
@@ -550,6 +555,7 @@ extension SpaceController: UIStateRestorable {
   func restore(withState state: UIState) {
     _viewportsKeys = state.keys
     _currentKey = state.currentKey
+
     if let bgColor = UIColor(codableColor: state.bgColor) {
       view.backgroundColor = bgColor
     }
@@ -1015,6 +1021,9 @@ extension SpaceController {
 
 extension SpaceController: CommandsHUDViewDelegate {
   @objc func currentTerm() -> TermController? {
+    
+    dashboardBrain.activeSession = _currentKey
+    
     if let currentKey = _currentKey {
       return SessionRegistry.shared[currentKey]
     }
