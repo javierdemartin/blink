@@ -106,6 +106,9 @@
   } else if (indexPath.section == 1 && indexPath.row == 3) {
     UIViewController *vc = [SettingsHostingController createNotificationsWithNav:self.navigationController];
     [self.navigationController pushViewController:vc animated:YES];
+  } else if (indexPath.section == 0 && indexPath.row == 3) {
+    UIViewController *vc = [PortForwardHostingController createWithNav:self.navigationController];
+    [self.navigationController pushViewController:vc animated:YES];
   }
 }
 

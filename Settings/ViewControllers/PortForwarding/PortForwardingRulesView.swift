@@ -33,6 +33,8 @@
 import Foundation
 import SwiftUI
 
+// TODO: Integrate with SSH Wrapper
+
 @objc class PortForwardHostingController: NSObject {
   
   @objc static func createWith(nav: UINavigationController?) -> UIViewController {
@@ -97,7 +99,6 @@ struct PortForwardingRulesView: View {
                     }
                     
                     VStack {
-
                       Text("\(rule.type) \(rule.portFrom):\(rule.destination):\(rule.portTo)")
                     }
                   }

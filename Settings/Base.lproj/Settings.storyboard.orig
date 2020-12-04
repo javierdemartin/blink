@@ -2,9 +2,13 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="hAE-Bj-MeI">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
+<<<<<<< HEAD
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Image references" minToolsVersion="12.0"/>
+=======
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+>>>>>>> Added PortForward to Settings
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -2334,8 +2338,11 @@
     </inferredMetricsTieBreakers>
     <resources>
         <image name="appearance" width="22" height="22"/>
-        <image name="arrowshape.zigzag.right.fill" catalog="system" width="128" height="93"/>
+<<<<<<< HEAD
         <image name="bell.fill" catalog="system" width="128" height="124"/>
+=======
+        <image name="arrowshape.zigzag.right.fill" catalog="system" width="128" height="93"/>
+>>>>>>> Added PortForward to Settings
         <image name="cloud" width="22" height="22"/>
         <image name="finger" width="22" height="22"/>
         <image name="host" width="22" height="22"/>
@@ -2392,8 +2399,11 @@
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+<<<<<<< HEAD
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
+=======
+>>>>>>> Added PortForward to Settings
     </resources>
 </document>

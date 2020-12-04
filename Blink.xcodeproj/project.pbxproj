@@ -38,6 +38,10 @@
 		22A9494C2067FD5E003A0666 /* tar.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22A9494A2067FD5E003A0666 /* tar.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3352036EE87001FCC5C /* openssl.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3332036EE86001FCC5C /* openssl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22E1F3362036EE87001FCC5C /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3342036EE86001FCC5C /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		800EAAAC257A86CB002DF417 /* LongProcesses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAAAB257A86CB002DF417 /* LongProcesses.swift */; };
+		800EAAB6257A8737002DF417 /* HostInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAAB5257A8737002DF417 /* HostInfo.swift */; };
+		800EAAB9257A8ECC002DF417 /* TerminalCarrousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAAB8257A8ECC002DF417 /* TerminalCarrousel.swift */; };
+		800EAACD257AA65F002DF417 /* DashboardBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAACC257AA65F002DF417 /* DashboardBrain.swift */; };
 		805CA651257679B100D50B47 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805CA650257679B100D50B47 /* Color.swift */; };
 		80D2442F25728D0F0097793A /* BKDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2442E25728D0F0097793A /* BKDashboard.swift */; };
 		80D2443425728DA60097793A /* UIPanGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */; };
@@ -415,6 +419,10 @@
 		22A9494A2067FD5E003A0666 /* tar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = tar.framework; sourceTree = "<group>"; };
 		22E1F3332036EE86001FCC5C /* openssl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openssl.framework; sourceTree = "<group>"; };
 		22E1F3342036EE86001FCC5C /* libssh2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libssh2.framework; sourceTree = "<group>"; };
+		800EAAAB257A86CB002DF417 /* LongProcesses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongProcesses.swift; sourceTree = "<group>"; };
+		800EAAB5257A8737002DF417 /* HostInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostInfo.swift; sourceTree = "<group>"; };
+		800EAAB8257A8ECC002DF417 /* TerminalCarrousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalCarrousel.swift; sourceTree = "<group>"; };
+		800EAACC257AA65F002DF417 /* DashboardBrain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBrain.swift; sourceTree = "<group>"; };
 		805CA650257679B100D50B47 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		80D2442E25728D0F0097793A /* BKDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKDashboard.swift; sourceTree = "<group>"; };
 		80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPanGestureRecognizer.swift; sourceTree = "<group>"; };
@@ -944,6 +952,10 @@
 			isa = PBXGroup;
 			children = (
 				80D2442E25728D0F0097793A /* BKDashboard.swift */,
+				800EAAAB257A86CB002DF417 /* LongProcesses.swift */,
+				800EAAB5257A8737002DF417 /* HostInfo.swift */,
+				800EAAB8257A8ECC002DF417 /* TerminalCarrousel.swift */,
+				800EAACC257AA65F002DF417 /* DashboardBrain.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
@@ -1724,6 +1736,7 @@
 				D23742CA21106ADF00366359 /* bench.m in Sources */,
 				D2071B83215101DC000156D7 /* blink-compat.c in Sources */,
 				D240806120BC8DF800F30099 /* tool_main.c in Sources */,
+				800EAAB9257A8ECC002DF417 /* TerminalCarrousel.swift in Sources */,
 				D29619AD214FB5EA0070935A /* ssh-ed25519.c in Sources */,
 				B7D6A6291E2D43A800EDF7B0 /* BKSmartKeysConfigViewController.m in Sources */,
 				D23AA645223EA3C40020FA77 /* BKXCallBackUrlConfigurationViewController.m in Sources */,
@@ -1777,6 +1790,8 @@
 				D241CBDC23040734003D64A5 /* KBKeyViewVertical2.swift in Sources */,
 				D2C24423238E44AB0082C69C /* KBWebView.swift in Sources */,
 				D2C24417238E44AB0082C69C /* KeyConfig.swift in Sources */,
+				800EAAB6257A8737002DF417 /* HostInfo.swift in Sources */,
+				800EAAAC257A86CB002DF417 /* LongProcesses.swift in Sources */,
 				D28F301A21AD8A6B00E5259F /* DeviceInfo.m in Sources */,
 				D29619AE214FB5EA0070935A /* ssh-rsa.c in Sources */,
 				D2179F2F2136DBC600B0850A /* geo.m in Sources */,
@@ -1804,6 +1819,7 @@
 				D2EFE1F520B7FAFC0087888B /* link_files.m in Sources */,
 				D2C24418238E44AB0082C69C /* KBConfigView.swift in Sources */,
 				D2F330CA20A6CB840074ADD7 /* help.m in Sources */,
+				800EAACD257AA65F002DF417 /* DashboardBrain.swift in Sources */,
 				D2A90AE220D277E00073BF3D /* ssh.m in Sources */,
 				D241CBD223040734003D64A5 /* KBDevice.swift in Sources */,
 				D2334D1C21495DAE00D26AC3 /* udptunnel.m in Sources */,
