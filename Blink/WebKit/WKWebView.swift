@@ -97,7 +97,7 @@ class UIScrollViewWithoutHitTest: UIScrollView {
   private let _2fTapRecognizer = UITapGestureRecognizer()
   private let _pinchRecognizer = UIPinchGestureRecognizer()
   private let _3fTapRecognizer = UITapGestureRecognizer()
-  private let _dashboardRecognizer = UIScreenEdgePanGestureRecognizer()
+  private let _leftEdgeDashboardRecognizer = UIScreenEdgePanGestureRecognizer()
   private let _longPressRecognizer = UILongPressGestureRecognizer()
   private let _hoverRecognizer = UIHoverGestureRecognizer()
   private var _characterSize: CGSize? = nil
@@ -128,7 +128,7 @@ class UIScrollViewWithoutHitTest: UIScrollView {
       _1fTapRecognizer,
       _2fTapRecognizer,
       _3fTapRecognizer,
-      _dashboardRecognizer,
+      _leftEdgeDashboardRecognizer,
       _pinchRecognizer,
       _longPressRecognizer,
       _scrollView.panGestureRecognizer,
@@ -203,9 +203,11 @@ class UIScrollViewWithoutHitTest: UIScrollView {
     _3fTapRecognizer.numberOfTouchesRequired = 3
     _3fTapRecognizer.delegate = self
     
-    _dashboardRecognizer.delegate = self
-    _dashboardRecognizer.edges = .left
-    _dashboardRecognizer.addTarget(self, action: #selector(_onDashboardSwipe(_:)))
+    _leftEdgeDashboardRecognizer.delegate = self
+    // TODO: UIScreenEdgePanGestureRecognizer doesn't seem to recognise left side's drag using a trackpad
+    _leftEdgeDashboardRecognizer.allowedScrollTypesMask = .all
+    _leftEdgeDashboardRecognizer.edges = .left
+    _leftEdgeDashboardRecognizer.addTarget(self, action: #selector(_onDashboardAppearEdgeSwipe(_:)))
     
     _longPressRecognizer.delegate = self
     
@@ -288,7 +290,7 @@ class UIScrollViewWithoutHitTest: UIScrollView {
     }
   }
   
-  @objc private func _onDashboardSwipe(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
+  @objc private func _onDashboardAppearEdgeSwipe(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
     
     if let target = _wkWebView?.target(forAction: #selector(handleDashboardGesture(_:)), withSender: gestureRecognizer) as? UIResponder {
       target.perform(#selector(handleDashboardGesture(_:)), with: gestureRecognizer)
@@ -334,7 +336,7 @@ extension WKWebViewGesturesInteraction: UIGestureRecognizerDelegate {
    */
   func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
     
-    if gestureRecognizer == _dashboardRecognizer {
+    if gestureRecognizer == _leftEdgeDashboardRecognizer {
       return true
     }
     

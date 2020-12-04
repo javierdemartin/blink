@@ -61,7 +61,7 @@ class SpaceController: UIViewController {
     return viewController
   }()
   
-  lazy var commonActionsHostingController: SwiftUIHostingController = {
+  lazy var longRunningProcessesHostingController: SwiftUIHostingController = {
     
     let hostingController = SwiftUIHostingController(rootView: AnyView(LongProcessesView()), environmentSettings: dashboardBrain)
     hostingController.view.backgroundColor = UIColor.clear
@@ -82,7 +82,6 @@ class SpaceController: UIViewController {
 
   
   var initialBottomLeftPosition = CGPoint()  // The initial center point of the view.
-  var initialVerticalBottomLeftPosition = CGPoint()  // The initial center point of the view.
   var initialTopRightPosition = CGPoint()
   var translatedBottomLeftPosition = CGPoint()
   var translatedVerticalBottomLeftPosition = CGPoint()
@@ -109,7 +108,20 @@ class SpaceController: UIViewController {
    */
   private var _viewportsKeys = [UUID]() {
     didSet {
-      dashboardBrain.numberOfActiveSessions = _viewportsKeys
+      
+      
+      var sessions: [BrainSessionData] = []
+      
+      _viewportsKeys.forEach({ uuid in
+        
+        let term: TermController = SessionRegistry.shared[uuid]
+        
+        sessions.append(BrainSessionData(id: uuid, title: term.title ?? "Blink"))
+        
+      })
+      
+//      dashboardBrain.activeTerminalControllers = _viewportsKeys
+      dashboardBrain.activeTerminalControllers = sessions
     }
   }
   
@@ -194,6 +206,8 @@ class SpaceController: UIViewController {
       
       case .newTab:
         self.newShellAction()
+      case .closeTab(id: let uuid):
+        self._closeSpaceBy(uuid: uuid)
       case .enableGeoLock:
         break
       case .stopGeoLock:
@@ -230,7 +244,7 @@ class SpaceController: UIViewController {
         self._moveToShell(key: term, animated: true)
       case .reorderedTerms(current: let key, ids: let ids):
         
-        self._viewportsKeys = ids
+        self._viewportsKeys = ids.flatMap({ $0.id })
         self._currentKey = key
         
         /**
@@ -285,21 +299,22 @@ class SpaceController: UIViewController {
     }
     
     let hideGesture = UIPanGestureRecognizer(target: self, action: #selector(handleDashboardGesture(_:)))
+    hideGesture.allowedScrollTypesMask = .all
     bottomLeftStackView.addGestureRecognizer(hideGesture)
     
     let guide = view.safeAreaLayoutGuide
     
     dashboardHostingController.view.frame = view.bounds
-    commonActionsHostingController.view.frame = view.bounds
+    longRunningProcessesHostingController.view.frame = view.bounds
     terminalsCarrousel.view.frame = view.bounds
     bottomLeftStackView.frame = view.bounds
     
-    view.addSubview(commonActionsHostingController.view)
-    addChild(commonActionsHostingController)
+    view.addSubview(longRunningProcessesHostingController.view)
+    addChild(longRunningProcessesHostingController)
     view.addSubview(bottomLeftStackView)
       
     NSLayoutConstraint.activate([
-      commonActionsHostingController.view.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+      longRunningProcessesHostingController.view.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
       bottomLeftStackView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
       bottomLeftStackView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
       bottomLeftStackView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
@@ -307,20 +322,20 @@ class SpaceController: UIViewController {
       terminalsCarrousel.view.trailingAnchor.constraint(equalTo: bottomLeftStackView.trailingAnchor)
     ])
     
+    /**
+     Due to big screen size on an iPad the bototm left (carrousel & information) and long running processes
+     are presented separatelly. On an iPhone they are stacked vertically.
+     */
     if UIDevice.current.userInterfaceIdiom == .pad {
       
-      
       NSLayoutConstraint.activate([
-        commonActionsHostingController.view.topAnchor.constraint(equalTo: guide.topAnchor)
+        longRunningProcessesHostingController.view.topAnchor.constraint(equalTo: guide.topAnchor)
       ])
-    }
-
-    /// UI layout specific constraints for iPhones
-    else if UIDevice.current.userInterfaceIdiom == .phone {
+    } else if UIDevice.current.userInterfaceIdiom == .phone {
 
       /// Stack up the layout vertically
       NSLayoutConstraint.activate([
-        commonActionsHostingController.view.bottomAnchor.constraint(equalTo: bottomLeftStackView.topAnchor)
+        longRunningProcessesHostingController.view.bottomAnchor.constraint(equalTo: bottomLeftStackView.topAnchor)
       ])
     }
     
@@ -418,9 +433,37 @@ class SpaceController: UIViewController {
     }
   }
   
+  /**
+   Used by `BKDashboard` to close a specific `TermController` by its `UUID`
+   */
+  func _closeSpaceBy(uuid: UUID) {
+    let term: TermController = SessionRegistry.shared[uuid]
+    
+    term.terminate()
+    _removeCurrentSpace(by: uuid)
+  }
+  
   func _closeCurrentSpace() {
     currentTerm()?.terminate()
     _removeCurrentSpace()
+  }
+  
+  /**
+   Remove
+   */
+  private func _removeCurrentSpace(by id: UUID, attachInput: Bool = true) {
+    guard let idx = _viewportsKeys.firstIndex(of: id) else {
+      return
+    }
+
+    SessionRegistry.shared.remove(forKey: id)
+    
+    _viewportsKeys.remove(at: idx)
+    
+    if _viewportsKeys.isEmpty {
+      _createShell(userActivity: nil, animated: true)
+      return
+    }
   }
   
   private func _removeCurrentSpace(attachInput: Bool = true) {
@@ -1104,7 +1147,7 @@ extension SpaceController {
     
     self.view.layer.removeAllAnimations()
     self.bottomLeftStackView.layer.removeAllAnimations()
-    self.commonActionsHostingController.view.layer.removeAllAnimations()
+    self.longRunningProcessesHostingController.view.layer.removeAllAnimations()
     
     // Animate the appearing/disappearing of the view with some springiness added to it
     UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseIn, animations: {
@@ -1113,18 +1156,18 @@ extension SpaceController {
         self.getInterestingLinks()
         
         self.bottomLeftStackView.center.x = self.bottomLeftStackView.frame.size.width/2
-        self.commonActionsHostingController.view.center.x = self.view.frame.width - self.commonActionsHostingController.view.frame.width / 2
+        self.longRunningProcessesHostingController.view.center.x = self.view.frame.width - self.longRunningProcessesHostingController.view.frame.width / 2
         self.bottomLeftStackView.fadeIn()
         
-        self.commonActionsHostingController.view.fadeIn()
+        self.longRunningProcessesHostingController.view.fadeIn()
       } else {
         self.bottomLeftStackView.center.x = -1 * self.bottomLeftStackView.frame.size.width/2
-        self.commonActionsHostingController.view.center.x = self.view.frame.width + self.commonActionsHostingController.view.frame.width / 2
+        self.longRunningProcessesHostingController.view.center.x = self.view.frame.width + self.longRunningProcessesHostingController.view.frame.width / 2
         self.bottomLeftStackView.fadeOut(0.15, onCompletion: {
           self.bottomLeftStackView.layoutIfNeeded()
         })
-        self.commonActionsHostingController.view.fadeOut(0.15, onCompletion: {
-          self.commonActionsHostingController.view.layoutIfNeeded()
+        self.longRunningProcessesHostingController.view.fadeOut(0.15, onCompletion: {
+          self.longRunningProcessesHostingController.view.layoutIfNeeded()
         })
       }
     })
@@ -1148,12 +1191,12 @@ extension SpaceController {
         
         /// As views are out of screen they've been hidden, before animating their appearance unhide them
         bottomLeftStackView.isHidden = false
-        commonActionsHostingController.view.isHidden = false
+        longRunningProcessesHostingController.view.isHidden = false
         
         getInterestingLinks()
         
         initialBottomLeftPosition.x = bottomLeftStackView.frame.origin.x
-        initialTopRightPosition = commonActionsHostingController.view.frame.origin
+        initialTopRightPosition = longRunningProcessesHostingController.view.frame.origin
       case .ended:
         
         var finalBottomLeftSnapPosition = CGPoint(x: translatedBottomLeftPosition.x, y: initialBottomLeftPosition.y)
@@ -1163,14 +1206,14 @@ extension SpaceController {
         if translatedBottomLeftPosition.x > initialBottomLeftPosition.x {
           
           finalBottomLeftSnapPosition.x = 0.0
-          finalTopRightSnapPosition.x = view.frame.width - 1 * commonActionsHostingController.view.frame.width
+          finalTopRightSnapPosition.x = view.frame.width - longRunningProcessesHostingController.view.frame.width
           
           // Animate the appearing/disappearing of the view with some springiness added to it
           UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.4, options: .curveEaseOut, animations: {
             self.bottomLeftStackView.frame.origin.x = finalBottomLeftSnapPosition.x
-            self.commonActionsHostingController.view.frame.origin.x = finalTopRightSnapPosition.x
+            self.longRunningProcessesHostingController.view.frame.origin.x = finalTopRightSnapPosition.x
             self.bottomLeftStackView.fadeIn()
-            self.commonActionsHostingController.view.fadeIn()
+            self.longRunningProcessesHostingController.view.fadeIn()
           })
         }
         /// View is about to be hidden
@@ -1178,14 +1221,14 @@ extension SpaceController {
           
           finalBottomLeftSnapPosition.x = -1 * dashboardHostingController.view.frame.width
           finalTopRightSnapPosition.x = self.view.frame.width
-                                          + commonActionsHostingController.view.frame.width
+                                          + longRunningProcessesHostingController.view.frame.width
           
           // Animate the appearance/disappearance of the view with some springiness added to it
           UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.4, options: .curveEaseIn, animations: {
             self.bottomLeftStackView.frame.origin.x = finalBottomLeftSnapPosition.x
-            self.commonActionsHostingController.view.frame.origin.x = finalTopRightSnapPosition.x
+            self.longRunningProcessesHostingController.view.frame.origin.x = finalTopRightSnapPosition.x
             self.bottomLeftStackView.fadeOut()
-            self.commonActionsHostingController.view.fadeOut()
+            self.longRunningProcessesHostingController.view.fadeOut()
           })
         }
         
@@ -1199,13 +1242,16 @@ extension SpaceController {
           alphaPercentage = 1 - alphaPercentage
         }
         
+        bottomLeftStackView.alpha = alphaPercentage
+        longRunningProcessesHostingController.view.alpha = alphaPercentage
+        
         translatedBottomLeftPosition.x = initialBottomLeftPosition.x
                                           + gestureRecognizer.translation(in: self.view).x
         translatedTopRightPosition.x = initialTopRightPosition.x
                                         - gestureRecognizer.translation(in: self.view).x * alphaPercentage
         
         bottomLeftStackView.frame.origin.x = translatedBottomLeftPosition.x
-        commonActionsHostingController.view.frame.origin.x = translatedTopRightPosition.x
+        longRunningProcessesHostingController.view.frame.origin.x = translatedTopRightPosition.x
         
       default:
         break
@@ -1220,7 +1266,7 @@ extension SpaceController {
       
       switch gestureRecognizer.state {
       case .began:
-        initialVerticalBottomLeftPosition = self.bottomLeftStackView.center
+        initialBottomLeftPosition.y = self.bottomLeftStackView.center.y
         
       /// Match the ending position depending on the gesture the user has done
       case .ended:
@@ -1253,7 +1299,7 @@ extension SpaceController {
         }
         
         /// Progressivelly follow the finger down/up when hiding/showing the carrousel.
-        if translatedVerticalBottomLeftPosition.y > initialVerticalBottomLeftPosition.y {
+        if translatedVerticalBottomLeftPosition.y > initialBottomLeftPosition.y {
           /// Increase the alpha when the view is appearing
           terminalsCarrousel.view.alpha = 1 - alphaPercentage
         } else {
@@ -1267,38 +1313,18 @@ extension SpaceController {
         }
         
         /// Translated movement is only the initial position plus the recognized gesture
-        translatedVerticalBottomLeftPosition.y = initialVerticalBottomLeftPosition.y
+        translatedVerticalBottomLeftPosition.y = initialBottomLeftPosition.y
                                                   + gestureRecognizer.translation(in: view).y
         
-        
         bottomLeftStackView.center.y = translatedVerticalBottomLeftPosition.y
+        
+        /// Forbid dragging upwards when the gesture has reached enough height
+        if (abs(translatedVerticalBottomLeftPosition.y - initialBottomLeftPosition.y) > bottomLeftStackView.frame.height) && panDirection == .up {
+          gestureRecognizer.state = .ended
+        }
         
       default: break
       }
     }
   }
-}
-
-extension UIView {
-  /// Animate the appearance of an `UIView`
-  func fadeIn(_ duration: TimeInterval? = 0.2, onCompletion: (() -> Void)? = nil) {
-    self.alpha = 0
-    self.isHidden = false
-    UIView.animate(withDuration: duration!,
-                   animations: { self.alpha = 1 },
-                   completion: { (value: Bool) in
-                    if let complete = onCompletion { complete() }
-                   })
-  }
-  
-  /// Animate the disappearance of an `UIView`
-  func fadeOut(_ duration: TimeInterval? = 0.2, onCompletion: (() -> Void)? = nil) {
-    UIView.animate(withDuration: duration!,
-                   animations: { self.alpha = 0 },
-                   completion: { (value: Bool) in
-                    self.isHidden = true
-                    if let complete = onCompletion { complete() }
-                   })
-  }
-  
 }
