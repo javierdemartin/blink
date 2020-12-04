@@ -30,4 +30,127 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-import Foundation
+import SwiftUI
+
+/**
+ Vertical widget on the bottom-left that shows information of the current `TerminalController` shown on screen.
+ */
+struct HostInfoView: View {
+  
+  // TODO: Update info with the new wrapper on terminal's change
+  @State var hostname: String = "javier.blink.zone"
+  @State var user: String = "javier"
+  // TODO: Get session's data
+  @State var lifetime: Date = Date()
+  
+  @State private var isPresentingDocumentPicker = false
+  
+  @State private var isPresentingPortForwardConfig = false
+  
+  var body: some View {
+    VStack(alignment: .leading) {
+      
+      Menu(content: {
+        Group {
+          // TODO: Integrate with the key agent
+          Label("Manage Agent", systemImage: "key")
+        }
+        
+        Divider()
+        
+        Group {
+          Button(action: {
+            isPresentingDocumentPicker.toggle()
+          }) {
+            Label("Upload File", systemImage: "folder")
+              .foregroundColor(BKDashboardColor.secondary)
+          }
+          // TODO: How to pre-select all of the possible files?
+        }
+        
+        Divider()
+        
+        Group {
+          Label("Manage Ports", systemImage: "bolt.horizontal.fill")
+          
+          Label("Upload File", systemImage: "terminal.fill")
+        }
+        
+        Divider()
+        
+        Group {
+          Label("New Connection", systemImage: "network")
+        }
+        
+      }, label: {
+        Button(action: {
+          
+        }) {
+          HStack {
+            Image(systemName: "network")
+              .modifier(ImageStyle())
+            
+            Text(hostname).bold()
+          }
+          .modifier(HeaderElement())
+        }
+        .modifier(HeaderElement())
+        .buttonStyle(PlainButtonStyle())
+        .foregroundColor(BKDashboardColor.textColor)
+      })
+      
+      HStack {
+        Image(systemName: "person")
+          .modifier(ImageStyle())
+        
+        Text(user)
+      }
+      .modifier(HeaderElement())
+      .foregroundColor(BKDashboardColor.secondText)
+      
+      HStack {
+        Image(systemName: "key")
+          .modifier(ImageStyle())
+        
+        Text("Key Agent")
+      }
+      .modifier(HeaderElement())
+      .foregroundColor(BKDashboardColor.secondText)
+      
+      Button(action: {
+        isPresentingPortForwardConfig.toggle()
+      }) {
+        HStack {
+          Image(systemName: "bolt.horizontal.fill")
+            .modifier(ImageStyle())
+          // TODO: Integrate with the currently active tunnels
+          Text("2050")
+        }
+        .foregroundColor(BKDashboardColor.secondText)
+      }
+      .buttonStyle(PlainButtonStyle())
+      .sheet(isPresented: $isPresentingPortForwardConfig) { PortForwardingRulesView() }
+      
+      HStack {
+        Image(systemName: "clock")
+          .modifier(ImageStyle())
+        
+        Text("5 hours")
+      }
+      .foregroundColor(BKDashboardColor.secondText)
+    }
+    .modifier(Module())
+    .modifier(ModulePadding())
+    .fileImporter(isPresented: $isPresentingDocumentPicker, allowedContentTypes: [], onCompletion: { result in
+      
+      switch result {
+      
+      case .success(let fileUrl):
+        // TODO: Attach to the wrapper and upload the file to the host
+        print(fileUrl)
+      case .failure(let er):
+        print(er)
+      }
+    })
+  }
+}

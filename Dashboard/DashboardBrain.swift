@@ -31,3 +31,39 @@
 
 
 import Foundation
+import Combine
+
+/**
+ Brains of the Dashboard that publish and interact with the actions performed.
+ 
+ Used to handle events such as timers or notifications. Publishes the data valus for
+ which it is responsible as published properties. Observer objects then subscribe to the publisher and receive updates whenever canges to the @Published properties occur.
+ */
+class DashboardBrain: ObservableObject {
+  
+  /// Identified URLs
+  @Published var urls: [String] = []
+  
+  /// Recent downloads
+  @Published var downloads: [String] = []
+  
+  /// Action executed by an element
+  @Published var dashboardAction = PassthroughSubject<BKDashboardAction, Never>()
+  
+  /// Consecuence of an action, used to update the interface after
+  @Published var dashboardConsecuence = PassthroughSubject<BKDashboardConsequence, Never>()
+  
+  /// Identifier of active `TerminalControllers`
+  @Published var activeTerminalControllers: [BrainSessionData] = []
+  
+  @Published var activeSession: UUID?
+  
+  // TODO: Define how to keep track of current sessions and associated tunnel.
+}
+
+struct BrainSessionData {
+  var id: UUID
+  var title: String?
+  /// TODO: Get current proces of the terminal to show it on the carrousel
+  /// TODO: Get more info to show in the Term carrousel
+}
