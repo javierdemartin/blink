@@ -39,39 +39,13 @@ enum SSHPortForwardType: String, Codable, CaseIterable {
   case dynamic = "Dynamic"
 }
 
+// TODO: Set up iCloud sync of the saved PortForward rules
 class BKPortForwardRule: NSObject, NSCoding {
-  func encode(with coder: NSCoder) {
-    coder.encode(label, for: CodingKeys.label)
-    coder.encode(type, for: CodingKeys.type)
-    coder.encode(portFrom, for: CodingKeys.portFrom)
-    coder.encode(portTo, for: CodingKeys.portTo)
-    coder.encode(destination, for: CodingKeys.destination)
-    
-  }
-  
-  required init?(coder: NSCoder) {
-    // Can't store custom classes as a node in the file system as it has no notion of the existence of
-    // https://stackoverflow.com/questions/4197246/storing-nsmutablearray-filled-with-custom-objects-in-nsuserdefaults-crash/4197319#4197319
-    label = coder.decodeObject(forKey: "label") as? String
-    type = coder.decodeObject(forKey: "type") as? String ?? ""
-    portFrom = coder.decodeObject(forKey: "portFrom") as? String ?? ""
-    portTo = coder.decodeObject(forKey: "portTo") as? String ?? ""
-    destination = coder.decodeObject(forKey: "destination") as? String ?? ""
-//    cloudKitRecordId = coder.decodeObject(forKey: "cloudKitRecordId") as! CKRecord.ID
-  }
-  
-  var id = UUID()
-  var label: String?
-  var type: String
-  var portFrom: String
-  var portTo: String
-  var destination: String
-  var enabled: Bool = false
-//  var cloudKitRecordId: CKRecord.ID
   
   enum CodingKeys : String, CodingKey {
+    case id = "id"
     case label = "label"
-    case type = "type"
+    case tunnelType = "tunnelType"
     case portFrom = "portFrom"
     case portTo = "portTo"
     case destination = "destination"
@@ -79,13 +53,41 @@ class BKPortForwardRule: NSObject, NSCoding {
     case cloudKitRecordId = "cloudKitRecordId"
   }
   
+  var id = UUID()
+  var label: String?
+  var tunnelType: String
+  var portFrom: String
+  var portTo: String
+  var destination: String
+  var enabled: Bool = false
+  
+  func encode(with coder: NSCoder) {
+    
+    coder.encode(id, for: CodingKeys.id)
+    coder.encode(label, for: CodingKeys.label)
+    coder.encode(tunnelType, for: CodingKeys.tunnelType)
+    coder.encode(portFrom, for: CodingKeys.portFrom)
+    coder.encode(portTo, for: CodingKeys.portTo)
+    coder.encode(destination, for: CodingKeys.destination)
+  }
+  
+  required init?(coder: NSCoder) {
+    
+    id = coder.decode(for: CodingKeys.id)!
+    label = coder.decode(for: CodingKeys.label)
+    tunnelType = coder.decode(for: CodingKeys.tunnelType)!
+    portFrom = coder.decode(for: CodingKeys.portFrom)!
+    portTo = coder.decode(for: CodingKeys.portTo)!
+    destination = coder.decode(for: CodingKeys.destination)!
+    enabled = coder.decode(for: CodingKeys.enabled)
+  }
+
   init(label: String?, type: SSHPortForwardType, portFrom: String, portTo: String, destination: String) {
     self.label = label
-    self.type = type.rawValue
+    self.tunnelType = type.rawValue
     self.portFrom = portFrom
     self.portTo = portTo
     self.destination = destination
-//    self.cloudKitRecordId = cloudKitRecordId
   }
   
   func load() {

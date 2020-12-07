@@ -127,5 +127,19 @@ extension NSCoder {
     decodeCGPoint(forKey: key.stringValue)
   }
   
+  // MARK: - UUID
+  
+  func encode(_ value: UUID, for key: CodingKey) {
+    encode(value, forKey: key.stringValue)
+  }
+  
+  func decode(for key: CodingKey) -> UUID? {
+    
+    guard let uuidString = decodeObject(of: NSString.self, forKey: key.stringValue) as String? else {
+      return nil
+    }
+    
+    return UUID(uuidString: uuidString)
+  }
 }
 

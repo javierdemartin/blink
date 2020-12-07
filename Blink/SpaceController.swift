@@ -53,17 +53,21 @@ class SpaceController: UIViewController {
     return stackView
   }()
   
-  lazy var dashboardHostingController: SwiftUIHostingController = {
-    let viewController = SwiftUIHostingController(rootView: AnyView(BKDashboard()), environmentSettings: dashboardBrain)
-    viewController.view.translatesAutoresizingMaskIntoConstraints = false
-    viewController.view.backgroundColor = UIColor.clear
+  lazy var dashboardHostingController: SwiftUIHostingController<BKDashboard> = {
     
-    return viewController
+    let hostingController = SwiftUIHostingController<BKDashboard>(rootView: AnyView(BKDashboard()), environmentSettings: dashboardBrain)
+    hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+    hostingController.view.backgroundColor = UIColor.clear
+    
+    return hostingController
   }()
   
-  lazy var longRunningProcessesHostingController: SwiftUIHostingController = {
+  /**
+   Top right widgets showing actions not related to terminal sessions
+   */
+  lazy var longRunningProcessesHostingController: SwiftUIHostingController<LongProcessesView> = {
     
-    let hostingController = SwiftUIHostingController(rootView: AnyView(LongProcessesView()), environmentSettings: dashboardBrain)
+    let hostingController = SwiftUIHostingController<LongProcessesView>(rootView: AnyView(LongProcessesView()), environmentSettings: dashboardBrain)
     hostingController.view.backgroundColor = UIColor.clear
     hostingController.view.translatesAutoresizingMaskIntoConstraints = false
     return hostingController
@@ -72,14 +76,13 @@ class SpaceController: UIViewController {
   /**
    Hosts all of the open terminals and the shortcut to open a new tab
    */
-  lazy var terminalsCarrousel: SwiftUIHostingController = {
-    let viewController = SwiftUIHostingController(rootView: AnyView(TerminalsCarrousel()), environmentSettings: dashboardBrain)
-    viewController.view.translatesAutoresizingMaskIntoConstraints = false
-    viewController.view.backgroundColor = UIColor.clear
+  lazy var terminalsCarrousel: SwiftUIHostingController<TerminalsCarrousel> = {
+    let hostingController = SwiftUIHostingController<TerminalsCarrousel>(rootView: AnyView(TerminalsCarrousel()), environmentSettings: dashboardBrain)
+    hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+    hostingController.view.backgroundColor = UIColor.clear
     
-    return viewController
+    return hostingController
   }()
-
   
   var initialBottomLeftPosition = CGPoint()  // The initial center point of the view.
   var initialTopRightPosition = CGPoint()

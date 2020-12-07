@@ -33,21 +33,38 @@ import SwiftUI
 import Combine
 import Foundation
 
-// TODO: Used in SpaceController
-class SwiftUIHostingController: UIHostingController<AnyView> {
+/**
+ View modifier methods return opaque views (`some View`) rather than complex generic types. This doesn't lets us use the following
+ syntax to use generics.
+ 
+ class SwiftUIHostingController<V: View>: UIHostingController<V>
+
+ The following links help with understanding this behavior:
+  - https://stackoverflow.com/a/57134853/4296481
+  - https://www.hackingwithswift.com/books/ios-swiftui/why-does-swiftui-use-some-view-for-its-view-type
+ 
+ For the meantime use `AnyView`.
+ */
+class SwiftUIHostingController<V: View>: UIHostingController<AnyView> {
+
   required init?(coder: NSCoder) {
-    
     super.init(coder: coder)
   }
   
+  /**
+   Receive a common `EnvironmentObject` to set it to the given `rootView`
+   */
   init(rootView: AnyView, environmentSettings: DashboardBrain) {
+    
     let listView = rootView.environmentObject(environmentSettings)
+    
     super.init(rootView: AnyView(listView))
   }
   
   override init(rootView: AnyView) {
     
     let listView = rootView.environmentObject(DashboardBrain())
+    
     super.init(rootView: AnyView(listView))
   }
   

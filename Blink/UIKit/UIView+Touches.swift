@@ -58,20 +58,32 @@ extension UIView {
     }
   }
   
-  /// Animate the appearance of an `UIView`
-  func fadeIn(_ duration: TimeInterval? = 0.2, onCompletion: (() -> Void)? = nil) {
+  /**
+   Animate the appearance of an `UIView`
+   
+   - Parameters:
+      - `duration`: Duration of the animation
+      - `onCompletion`: Optional callback to execute actions when the animation has finished
+   */
+  func fadeIn(_ duration: TimeInterval = 0.2, onCompletion: (() -> Void)? = nil) {
     self.alpha = 0
     self.isHidden = false
-    UIView.animate(withDuration: duration!,
+    UIView.animate(withDuration: duration,
                    animations: { self.alpha = 1 },
                    completion: { (value: Bool) in
                     if let complete = onCompletion { complete() }
                    })
   }
   
-  /// Animate the disappearance of an `UIView`
-  func fadeOut(_ duration: TimeInterval? = 0.2, onCompletion: (() -> Void)? = nil) {
-    UIView.animate(withDuration: duration!,
+  /**
+   Animate the disappearance of an `UIView`
+   
+   - Parameters:
+      - `duration`: Duration of the animation
+      - `onCompletion`: Optional callback to execute actions when the animation has finished
+   */
+  func fadeOut(_ duration: TimeInterval = 0.2, onCompletion: (() -> Void)? = nil) {
+    UIView.animate(withDuration: duration,
                    animations: { self.alpha = 0 },
                    completion: { (value: Bool) in
                     self.isHidden = true
