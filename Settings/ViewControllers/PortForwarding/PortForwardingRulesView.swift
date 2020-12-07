@@ -64,9 +64,9 @@ struct PortForwardingRulesView: View {
                 
                 NavigationLink(destination: NewPortForwardRuleView(rule: rule), label: {
                   HStack {
-                    if rule.type == "Local" {
+                    if rule.tunnelType == "Local" {
                       Image(systemName: "l.circle.fill")
-                    } else if rule.type == "Remote" {
+                    } else if rule.tunnelType == "Remote" {
                       Image(systemName: "r.circle.fill")
                     }
                     
@@ -92,18 +92,17 @@ struct PortForwardingRulesView: View {
                 
                 NavigationLink(destination: NewPortForwardRuleView(), label: {
                   HStack {
-                    if rule.type == "Local" {
+                    if rule.tunnelType == "Local" {
                       Image(systemName: "l.circle.fill")
-                    } else if rule.type == "Remote" {
+                    } else if rule.tunnelType == "Remote" {
                       Image(systemName: "r.circle.fill")
                     }
                     
                     VStack {
-                      Text("\(rule.type) \(rule.portFrom):\(rule.destination):\(rule.portTo)")
+                      Text("\(rule.tunnelType) \(rule.portFrom):\(rule.destination):\(rule.portTo)")
                     }
                   }
                 })
-                
                 
               }.onDelete(perform: stopRule)
             }
@@ -112,12 +111,10 @@ struct PortForwardingRulesView: View {
       }
       .navigationTitle(Text("Port forwarding"))
       .navigationBarItems(trailing:
-            Button(action: {
-              // TODO: Open a tunnel once the wrapper has been implemented
-              //              self.presentedAsModal = false
-            }, label: {
-              NavigationLink("New rule", destination: NewPortForwardRuleView())
-            })
+                            
+        NavigationLink(destination: NewPortForwardRuleView(), label: {
+          Text("New Rule")
+        })
       )
 
   }
@@ -133,10 +130,13 @@ struct PortForwardingRulesView: View {
 }
 
 
-
+/**
+ Aid view to help users realise what port forwarding operation they're creating
+ */
 struct PortForwardAidView: View {
   
-  @Binding var host: String
+  @Binding var allHosts: [BKHosts]
+  @Binding var selectedHost: Int
   @Binding var destination: String
   @Binding var portFrom: String
   @Binding var bindAddress: String
@@ -145,42 +145,48 @@ struct PortForwardAidView: View {
   
   var body: some View {
     
-    VStack(alignment: .leading) {
+    if allHosts.isEmpty {
     
-      if !host.isEmpty && !portFrom.isEmpty && !portTo.isEmpty && !bindAddress.isEmpty {
-      Text("Equivalent to ") +
-        Text("ssh -\(String(type.rawValue.prefix(1))) \(portFrom):\(destination):\(portTo) \(bindAddress).\n")
-        .font(.system(.caption, design: .monospaced))
+      Text("Please, create a host before creating Port Forwarding rules.").bold()
+      
+    } else {
+      VStack(alignment: .leading) {
         
-      if type == SSHPortForwardType.local {
-        Text("In ") + Text("local port forwarding").bold() + Text(" the SSH client listens for communication from the application client and therefore usually resides on the same box as the application client.\n")
-
-        Text("All traffic sent to port \(portFrom) on your localhost is being forwarded to port \(portTo) on the remote server located at \(destination).\n")
-      } else if type == .remote {
-        Text("In ") + Text("remote port forwarding").bold() + Text(" the SSH server listens for communication from the application client, the SSH server and application client reside on the same host.\n")
+        if !allHosts[selectedHost].host.isEmpty && !portFrom.isEmpty && !portTo.isEmpty && !bindAddress.isEmpty {
+          Text("Equivalent to ") +
+            Text("ssh -\(String(type.rawValue.prefix(1))) \(portFrom):\(destination):\(portTo) \(bindAddress).\n")
+            .font(.system(.caption, design: .monospaced))
+          
+          if type == SSHPortForwardType.local {
+            Text("In ") + Text("local port forwarding").bold() + Text(" the SSH client listens for communication from the application client and therefore usually resides on the same box as the application client.\n")
+            
+            Text("All traffic sent to port \(portFrom) on your localhost is being forwarded to port \(portTo) on the remote server located at \(destination).\n")
+          } else if type == .remote {
+            Text("In ") + Text("remote port forwarding").bold() + Text(" the SSH server listens for communication from the application client, the SSH server and application client reside on the same host.\n")
+            
+            Text("SSH server binds to the \(portFrom) on \(bindAddress). Any traffic received received on this port is sent to the SSH client on Blink  which in turn is forwarded to port \(portTo) on \(destination). You can open \(bindAddress):\(portFrom).")
+          }
+        }
         
-        Text("SSH server binds to the \(portFrom) on \(bindAddress). Any traffic received received on this port is sent to the SSH client on Blink  which in turn is forwarded to port \(portTo) on \(destination). You can open \(bindAddress):\(portFrom).")
+        Text("Due to system limitations Port Forwarding is active whenever Blink is open in the foreground or split view.").bold()
       }
-    }
-    
-    Text("Due to system limitations Port Forwarding is active whenever Blink is open in the foreground or split view.").bold()
     }
   }
 }
 
 class PortForwardRuleViewModel: ObservableObject {
   
-  @Published var allHosts: [BKHosts] = BKHosts.all() as! [BKHosts] //[]
+  @Published var allHosts: [BKHosts] = ((BKHosts.all() as? [BKHosts]) != nil) ? BKHosts.all() as! [BKHosts] : []
   @Published var destination: String = ""
   @Published var label: String = ""
   @Published var portFrom: String = ""
   @Published var bindAddress: String = ""
   @Published var portTo: String = ""
   @Published var enabled: Bool = false
-  var tunnelType: [SSHPortForwardType] = [.local, .remote]
+  /// Types of tunnels offered by the app
+  var tunnelType: [SSHPortForwardType] = [.local, .remote, .dynamic]
   @Published var selectedTunnelType: Int = 0
   @Published var selectedHost: Int = 0
-  
 }
 
 struct NewPortForwardRuleView: View {
@@ -198,31 +204,46 @@ struct NewPortForwardRuleView: View {
       viewModel.destination = rule.destination
       viewModel.portTo = rule.portTo
       viewModel.portFrom = rule.portFrom
-      viewModel.selectedTunnelType = SSHPortForwardType.allCases.firstIndex(of: SSHPortForwardType(rawValue: rule.type)!)!
+      viewModel.selectedTunnelType = SSHPortForwardType.allCases.firstIndex(of: SSHPortForwardType(rawValue: rule.tunnelType)!)!
     }
   }
   
   var body: some View {
     
     VStack {
-      Picker("Port Forwarding", selection: $viewModel.selectedTunnelType, content: {
-        ForEach(0..<viewModel.tunnelType.count) { i in
-          Text(viewModel.tunnelType[i].rawValue)
-        }
-      }).pickerStyle(SegmentedPickerStyle())
       
       Form {
         
-        Section(footer: PortForwardAidView(host: $viewModel.allHosts[viewModel.selectedHost].host, destination: $viewModel.destination, portFrom: $viewModel.portFrom, bindAddress: $viewModel.bindAddress, portTo: $viewModel.portTo, type: $viewModel.tunnelType[viewModel.selectedTunnelType])) {
-          
+        Picker("Port Forwarding", selection: $viewModel.selectedTunnelType, content: {
+          ForEach(0..<viewModel.tunnelType.count) { i in
+            Text(viewModel.tunnelType[i].rawValue)
+          }
+        }).pickerStyle(SegmentedPickerStyle())
+        
+        Section(footer: PortForwardAidView(allHosts: $viewModel.allHosts,
+                                           selectedHost: $viewModel.selectedHost,
+                                           destination: $viewModel.destination,
+                                           portFrom: $viewModel.portFrom,
+                                           bindAddress: $viewModel.bindAddress, portTo: $viewModel.portTo, type: $viewModel.tunnelType[viewModel.selectedTunnelType])) {
           
           TextField("Label", text: $viewModel.label)
+        
+        if viewModel.allHosts.isEmpty {
           
+          HStack {
+            Text("Host")
+            
+            Spacer()
+            
+            Text("Create host").redacted(reason: .placeholder)
+          }
+        } else {
           Picker("Host", selection: $viewModel.allHosts[viewModel.selectedHost], content: {
             ForEach(viewModel.allHosts, id: \.self) { host in
               Text(host.host)
             }
           })
+        }
           
           TextField("Port from", text: $viewModel.portFrom).keyboardType(.decimalPad)
           
@@ -237,22 +258,23 @@ struct NewPortForwardRuleView: View {
           TextField("Bind Address", text: $viewModel.bindAddress)
         }
       }
+      .disabled( viewModel.allHosts.isEmpty )
     }
     .navigationTitle(rule == nil ? Text("New Rule") : Text("\(rule!.portFrom):\(rule!.destination):\(rule!.portTo)"))
     .navigationBarItems(trailing:
-          Button(action: {
-            
-            if rule == nil {
-              BKPortForwardRule.save(label: viewModel.label.isEmpty ? nil : viewModel.label, type: viewModel.tunnelType[viewModel.selectedTunnelType], portFrom: viewModel.portFrom, portTo: viewModel.portTo, destination: viewModel.destination)
-            } else {
-              // TODO: Update already existing rule
-            }
-            
-            
-          }, label: {
-            Text("Save")
-          })
-          .disabled(viewModel.portFrom.isEmpty && viewModel.destination.isEmpty && viewModel.portTo.isEmpty)
+                          Button(action: {
+                            
+                            if rule == nil {
+                              BKPortForwardRule.save(label: viewModel.label.isEmpty ? nil : viewModel.label, type: viewModel.tunnelType[viewModel.selectedTunnelType], portFrom: viewModel.portFrom, portTo: viewModel.portTo, destination: viewModel.destination)
+                            } else {
+                              // TODO: Update already existing rule
+                            }
+                          }, label: {
+                            Text("Save")
+                          })
+                          .disabled(viewModel.portFrom.isEmpty && viewModel.destination.isEmpty && viewModel.portTo.isEmpty && viewModel.allHosts.isEmpty)
     )
   }
 }
+
+
