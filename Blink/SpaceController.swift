@@ -38,6 +38,12 @@ import Combine
 
 class SpaceController: UIViewController {
   
+  /**
+   Limits the movement of the dashboard to be only horizontal/vertical. Can't mix both directions.
+   If it's starts as an horizontal movement it will stay as is until it's finishes.
+   */
+  private var currentScrollDirection: PanDirection = .unknown
+  
   var cancellableBag: Set<AnyCancellable> = []
   
   lazy var dashboardBrain = DashboardBrain()
@@ -592,7 +598,7 @@ class SpaceController: UIViewController {
     _commandsHUD.updateHUD()
     
     // Triggered on each terminal screen to detect possible new links to interact with
-    getInterestingLinks()
+    _getInterestingLinks()
   }
   
 }
@@ -1129,7 +1135,7 @@ extension SpaceController {
    
    Called whenever a tab comes on/goes scope to display intersting links. The obtained URLs are
    */
-  func getInterestingLinks() {
+  private func _getInterestingLinks() {
     self.currentTerm()?.termDevice.view?.getInterestingLinks({ result in
       
       guard let result = result else { return }
@@ -1156,7 +1162,7 @@ extension SpaceController {
     UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseIn, animations: {
       if self.bottomLeftStackView.isHidden {
         
-        self.getInterestingLinks()
+        self._getInterestingLinks()
         
         self.bottomLeftStackView.center.x = self.bottomLeftStackView.frame.size.width/2
         self.longRunningProcessesHostingController.view.center.x = self.view.frame.width - self.longRunningProcessesHostingController.view.frame.width / 2
@@ -1183,7 +1189,7 @@ extension SpaceController {
     
     guard let panDirection = gestureRecognizer.direction else { return }
     
-    if panDirection == .left || panDirection == .right {
+    if (panDirection == .left || panDirection == .right) {
       
       /// If the UIStackView is already on screen and the user tries to drag it
       /// to the right side cancel the gesture as it's already on screen
@@ -1196,7 +1202,9 @@ extension SpaceController {
         bottomLeftStackView.isHidden = false
         longRunningProcessesHostingController.view.isHidden = false
         
-        getInterestingLinks()
+        currentScrollDirection = panDirection
+        
+        _getInterestingLinks()
         
         initialBottomLeftPosition.x = bottomLeftStackView.frame.origin.x
         initialTopRightPosition = longRunningProcessesHostingController.view.frame.origin
@@ -1237,24 +1245,29 @@ extension SpaceController {
         
       case .changed:
         
-        /// Progressivelly increase alpha when the view is hidden so the appearance is progressivelly smooth
-        var alphaPercentage = abs(gestureRecognizer.translation(in: self.view).x / bottomLeftStackView.frame.width)
-        
-        /// When dragging leftwards alpha decreases from 1 to 0
-        if panDirection == .left {
-          alphaPercentage = 1 - alphaPercentage
+        // Lock the movement so
+        if currentScrollDirection == .left || currentScrollDirection == .right {
+          
+          /// Progressivelly increase alpha when the view is hidden so the appearance is progressivelly smooth
+          var alphaPercentage = abs(gestureRecognizer.translation(in: self.view).x / bottomLeftStackView.frame.width)
+          
+          /// When dragging leftwards alpha decreases from 1 to 0
+          if panDirection == .left {
+            alphaPercentage = 1 - alphaPercentage
+          }
+          
+          bottomLeftStackView.alpha = alphaPercentage
+          longRunningProcessesHostingController.view.alpha = alphaPercentage
+          
+          translatedBottomLeftPosition.x = initialBottomLeftPosition.x
+                                            + gestureRecognizer.translation(in: self.view).x
+          translatedTopRightPosition.x = initialTopRightPosition.x
+                                          - gestureRecognizer.translation(in: self.view).x * alphaPercentage
+          
+          bottomLeftStackView.frame.origin.x = translatedBottomLeftPosition.x
+          longRunningProcessesHostingController.view.frame.origin.x = translatedTopRightPosition.x
         }
         
-        bottomLeftStackView.alpha = alphaPercentage
-        longRunningProcessesHostingController.view.alpha = alphaPercentage
-        
-        translatedBottomLeftPosition.x = initialBottomLeftPosition.x
-                                          + gestureRecognizer.translation(in: self.view).x
-        translatedTopRightPosition.x = initialTopRightPosition.x
-                                        - gestureRecognizer.translation(in: self.view).x * alphaPercentage
-        
-        bottomLeftStackView.frame.origin.x = translatedBottomLeftPosition.x
-        longRunningProcessesHostingController.view.frame.origin.x = translatedTopRightPosition.x
         
       default:
         break
@@ -1269,61 +1282,42 @@ extension SpaceController {
       
       switch gestureRecognizer.state {
       case .began:
+        
+        currentScrollDirection = panDirection
         initialBottomLeftPosition.y = self.bottomLeftStackView.center.y
         
       /// Match the ending position depending on the gesture the user has done
       case .ended:
-        
-        if panDirection == .down {
-          /// Swipe down gesture
-          self.terminalsCarrousel.view.fadeOut(0.15, onCompletion: {
-            self.bottomLeftStackView.layoutIfNeeded()
-            self.terminalsCarrousel.view.layoutIfNeeded()
-          })
+
+        if panDirection == .up {
+          terminalsCarrousel.view.fadeIn()
+        } else {
           
-        }  else {
-          /// Swipe up gesture
-          self.terminalsCarrousel.view.fadeIn(0.15, onCompletion: {
-            self.bottomLeftStackView.layoutIfNeeded()
-            self.terminalsCarrousel.view.layoutIfNeeded()
-          })
+          terminalsCarrousel.view.fadeOut()
         }
         
+        self.bottomLeftStackView.layoutIfNeeded()
+        self.terminalsCarrousel.view.layoutIfNeeded()
+
       /// Follow the finger's movement when the gesture is active
       case .changed:
         
-        // If pan direction is downwards start changing the apha
-        var alphaPercentage = abs(gestureRecognizer.translation(in: self.view).y / terminalsCarrousel.view.frame.height)
-        
-        if terminalsCarrousel.view.frame.height == 0 && panDirection == .down {
-          alphaPercentage = 1
-        } else if terminalsCarrousel.view.frame.height == 0 && panDirection == .up {
-          alphaPercentage = 0
-        }
-        
-        /// Progressivelly follow the finger down/up when hiding/showing the carrousel.
-        if translatedVerticalBottomLeftPosition.y > initialBottomLeftPosition.y {
-          /// Increase the alpha when the view is appearing
-          terminalsCarrousel.view.alpha = 1 - alphaPercentage
-        } else {
-          /// Increase the alpha when the view is appearing
-          terminalsCarrousel.view.alpha = alphaPercentage
-        }
-        
-        /// When following the finger down the alpha is decreasing, once it reaches the threshold of `0.1` hide the view finishing the interaction
-        if terminalsCarrousel.view.alpha <= 0.1 && panDirection == .down {
-          terminalsCarrousel.view.isHidden = true
-        }
-        
-        /// Translated movement is only the initial position plus the recognized gesture
-        translatedVerticalBottomLeftPosition.y = initialBottomLeftPosition.y
-                                                  + gestureRecognizer.translation(in: view).y
-        
-        bottomLeftStackView.center.y = translatedVerticalBottomLeftPosition.y
-        
-        /// Forbid dragging upwards when the gesture has reached enough height
-        if (abs(translatedVerticalBottomLeftPosition.y - initialBottomLeftPosition.y) > bottomLeftStackView.frame.height) && panDirection == .up {
-          gestureRecognizer.state = .ended
+        if currentScrollDirection == .up || currentScrollDirection == .down {
+          
+          /// Translated movement is only the initial position plus the recognized gesture
+          translatedVerticalBottomLeftPosition.y = initialBottomLeftPosition.y
+                                                    + gestureRecognizer.translation(in: view).y
+          
+          if panDirection == .down {
+            terminalsCarrousel.view.fadeOut()
+          }
+          
+          bottomLeftStackView.center.y = translatedVerticalBottomLeftPosition.y
+          
+          /// Forbid dragging upwards when the gesture has reached enough height
+          if (abs(translatedVerticalBottomLeftPosition.y - initialBottomLeftPosition.y) > bottomLeftStackView.frame.height) && panDirection == .up && !terminalsCarrousel.view.isHidden {
+            gestureRecognizer.state = .ended
+          }
         }
         
       default: break
