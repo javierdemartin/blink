@@ -42,13 +42,13 @@
 		800EAAB6257A8737002DF417 /* HostInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAAB5257A8737002DF417 /* HostInfo.swift */; };
 		800EAAB9257A8ECC002DF417 /* TerminalCarrousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAAB8257A8ECC002DF417 /* TerminalCarrousel.swift */; };
 		800EAACD257AA65F002DF417 /* DashboardBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAACC257AA65F002DF417 /* DashboardBrain.swift */; };
+		803B99D72582869200DC99C8 /* BKNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99D62582869200DC99C8 /* BKNotificationsView.swift */; };
+		803B99E3258381B200DC99C8 /* SettingsHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99E2258381B200DC99C8 /* SettingsHostingController.swift */; };
 		805CA651257679B100D50B47 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805CA650257679B100D50B47 /* Color.swift */; };
 		80D2442F25728D0F0097793A /* BKDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2442E25728D0F0097793A /* BKDashboard.swift */; };
 		80D2443425728DA60097793A /* UIPanGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */; };
 		80D2443925728E280097793A /* PortForwardingRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443825728E280097793A /* PortForwardingRulesView.swift */; };
 		80D2443D25728E4D0097793A /* BKPortForwardRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443C25728E4D0097793A /* BKPortForwardRule.swift */; };
-		803B99D72582869200DC99C8 /* BKNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99D62582869200DC99C8 /* BKNotificationsView.swift */; };
-		803B99E3258381B200DC99C8 /* SettingsHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99E2258381B200DC99C8 /* SettingsHostingController.swift */; };
 		85A34307200A837A009324F1 /* webfontloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A34303200A837A009324F1 /* webfontloader.js */; };
 		85A34309200A8FAF009324F1 /* term.css in Resources */ = {isa = PBXBuildFile; fileRef = 85A34308200A8FAF009324F1 /* term.css */; };
 		B700AED81DD0F2C200100EBF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B700AED71DD0F2C200100EBF /* CloudKit.framework */; };
@@ -237,7 +237,6 @@
 		D2C24423238E44AB0082C69C /* KBWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2C2440E238E44AB0082C69C /* KBWebView.swift */; };
 		D2C24424238E44AB0082C69C /* KBWebViewBase.m in Sources */ = {isa = PBXBuildFile; fileRef = D2C2440F238E44AB0082C69C /* KBWebViewBase.m */; };
 		D2C24425238E44AB0082C69C /* KeyModifierPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2C24410238E44AB0082C69C /* KeyModifierPicker.swift */; };
-		D2C2442F238E62A70082C69C /* KBSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2C2442E238E62A70082C69C /* KBSettingsViewController.swift */; };
 		D2C244332390FB830082C69C /* KeyBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2C244322390FB830082C69C /* KeyBinding.swift */; };
 		D2C244352390FEEF0082C69C /* KeyBindingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2C244342390FEEF0082C69C /* KeyBindingAction.swift */; };
 		D2C24437239104250082C69C /* ShortcutsConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2C24436239104250082C69C /* ShortcutsConfigView.swift */; };
@@ -423,13 +422,13 @@
 		800EAAB5257A8737002DF417 /* HostInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostInfo.swift; sourceTree = "<group>"; };
 		800EAAB8257A8ECC002DF417 /* TerminalCarrousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalCarrousel.swift; sourceTree = "<group>"; };
 		800EAACC257AA65F002DF417 /* DashboardBrain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBrain.swift; sourceTree = "<group>"; };
+		803B99D62582869200DC99C8 /* BKNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKNotificationsView.swift; sourceTree = "<group>"; };
+		803B99E2258381B200DC99C8 /* SettingsHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostingController.swift; sourceTree = "<group>"; };
 		805CA650257679B100D50B47 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		80D2442E25728D0F0097793A /* BKDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKDashboard.swift; sourceTree = "<group>"; };
 		80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPanGestureRecognizer.swift; sourceTree = "<group>"; };
 		80D2443825728E280097793A /* PortForwardingRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortForwardingRulesView.swift; sourceTree = "<group>"; };
 		80D2443C25728E4D0097793A /* BKPortForwardRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKPortForwardRule.swift; sourceTree = "<group>"; };
-		803B99D62582869200DC99C8 /* BKNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKNotificationsView.swift; sourceTree = "<group>"; };
-		803B99E2258381B200DC99C8 /* SettingsHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostingController.swift; sourceTree = "<group>"; };
 		85A34303200A837A009324F1 /* webfontloader.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = webfontloader.js; sourceTree = "<group>"; };
 		85A34308200A8FAF009324F1 /* term.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = term.css; sourceTree = "<group>"; };
 		B700AED71DD0F2C200100EBF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -940,6 +939,14 @@
 			path = Sessions;
 			sourceTree = SOURCE_ROOT;
 		};
+		803B99CB2582865500DC99C8 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				803B99D62582869200DC99C8 /* BKNotificationsView.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
 		805CA6602577F7C900D50B47 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
@@ -966,14 +973,6 @@
 				80D2443825728E280097793A /* PortForwardingRulesView.swift */,
 			);
 			path = PortForwarding;
-			sourceTree = "<group>";
-		};
-		803B99CB2582865500DC99C8 /* Notifications */ = {
-			isa = PBXGroup;
-			children = (
-				803B99D62582869200DC99C8 /* BKNotificationsView.swift */,
-			);
-			path = Notifications;
 			sourceTree = "<group>";
 		};
 		B75112C71DE4A7680040C693 /* UserConfiguration */ = {
@@ -1894,7 +1893,6 @@
 				079635871D0E6602000473B1 /* TermView.m in Sources */,
 				D241CBE6230562E9003D64A5 /* KBSizes.swift in Sources */,
 				D241CBD023040734003D64A5 /* KBKeyViewFlexible.swift in Sources */,
-				D2C2442F238E62A70082C69C /* KBSettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
