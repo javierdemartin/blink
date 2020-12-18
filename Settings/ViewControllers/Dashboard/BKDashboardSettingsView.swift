@@ -29,37 +29,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-import SwiftUI
-import UIKit
 
-@objc class SettingsHostingController: NSObject {
-  private static func _createWith<T: View>(view: T, nav: UINavigationController?) -> UIViewController {
-    guard
-      let nav = nav
-    else {
-      return UIHostingController(rootView: view)
+import SwiftUI
+
+struct BKDashboardSettingsView: View {
+    var body: some View {
+      List {
+        Section(header: Text("URL Detection"), footer: Text("Add URLS so they're not detected automatically")) {
+          Text("No URLs")
+        }
+      }.listStyle(InsetGroupedListStyle())
     }
-    return UIHostingController(rootView: NavView(navController: nav)  { view } )
-  }
-  
-  @objc static func createKeyboardControllerWith(nav: UINavigationController?) -> UIViewController {
-    _createWith(
-      view: KBConfigView(config: KBTracker.shared.loadConfig()),
-      nav: nav
-    )
-  }
-  
-  @objc static func createNotificationsWith(nav: UINavigationController?) -> UIViewController {
-    _createWith(
-      view: BKNotificationsView(),
-      nav: nav
-    )
-  }
-  
-  @objc static func createDashboardSettingswith(nav: UINavigationController?) -> UIViewController {
-    _createWith(
-      view: BKDashboardSettingsView(),
-      nav: nav
-    )
-  }
+}
+
+struct BKDashboardSettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        BKDashboardSettingsView()
+    }
 }

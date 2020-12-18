@@ -38,6 +38,8 @@ import AVFoundation
   // May be do it optional
   func terminalHangup(control: TermController)
   @objc optional func terminalDidResize(control: TermController)
+  func termReceivedBell(id: UUID)
+  func updatedTitle(id: UUID, title: String)
 }
 
 @objc protocol ControlPanelDelegate: NSObjectProtocol {
@@ -157,6 +159,8 @@ class TermController: UIViewController {
     super.viewWillTransition(to: size, with: coordinator)
   }
   
+  var cancellableBag = Set<AnyCancellable>()
+  
   public override func loadView() {
     super.loadView()
     _termDevice.delegate = self
@@ -171,6 +175,15 @@ class TermController: UIViewController {
     super.viewDidLoad()
     
     resumeIfNeeded()
+    
+//    _termView.title.publisher.
+    
+    _termView.webView.title.publisher.receive(on: RunLoop.current)
+      .sink(receiveValue: { value in
+      print(">>>>> \(value)")
+      self.delegate?.updatedTitle(id: self.meta.key, title: value)
+    })
+    .store(in: &cancellableBag)
     
     _termView.load(with: _sessionParams)
     
@@ -318,6 +331,8 @@ extension TermController: TermDeviceDelegate {
     guard BKDefaults.isOscNotificationsOn() else {
       return
     }
+    
+    delegate?.termReceivedBell(id: meta.key)
     
     /**
      - Show notification if terminal is in focus

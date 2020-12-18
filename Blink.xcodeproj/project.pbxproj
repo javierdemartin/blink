@@ -44,7 +44,9 @@
 		800EAACD257AA65F002DF417 /* DashboardBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800EAACC257AA65F002DF417 /* DashboardBrain.swift */; };
 		803B99D72582869200DC99C8 /* BKNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99D62582869200DC99C8 /* BKNotificationsView.swift */; };
 		803B99E3258381B200DC99C8 /* SettingsHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99E2258381B200DC99C8 /* SettingsHostingController.swift */; };
+		804B4EB72588B2390038BD7A /* BKDashboardSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804B4EB62588B2390038BD7A /* BKDashboardSettingsView.swift */; };
 		805CA651257679B100D50B47 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805CA650257679B100D50B47 /* Color.swift */; };
+		809F39D1258923A9000352A3 /* LongProcessesWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809F39D0258923A9000352A3 /* LongProcessesWidgets.swift */; };
 		80D2442F25728D0F0097793A /* BKDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2442E25728D0F0097793A /* BKDashboard.swift */; };
 		80D2443425728DA60097793A /* UIPanGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */; };
 		80D2443925728E280097793A /* PortForwardingRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D2443825728E280097793A /* PortForwardingRulesView.swift */; };
@@ -424,7 +426,9 @@
 		800EAACC257AA65F002DF417 /* DashboardBrain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardBrain.swift; sourceTree = "<group>"; };
 		803B99D62582869200DC99C8 /* BKNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKNotificationsView.swift; sourceTree = "<group>"; };
 		803B99E2258381B200DC99C8 /* SettingsHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostingController.swift; sourceTree = "<group>"; };
+		804B4EB62588B2390038BD7A /* BKDashboardSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKDashboardSettingsView.swift; sourceTree = "<group>"; };
 		805CA650257679B100D50B47 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		809F39D0258923A9000352A3 /* LongProcessesWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongProcessesWidgets.swift; sourceTree = "<group>"; };
 		80D2442E25728D0F0097793A /* BKDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKDashboard.swift; sourceTree = "<group>"; };
 		80D2443325728DA60097793A /* UIPanGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPanGestureRecognizer.swift; sourceTree = "<group>"; };
 		80D2443825728E280097793A /* PortForwardingRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortForwardingRulesView.swift; sourceTree = "<group>"; };
@@ -680,7 +684,6 @@
 		D2C2440E238E44AB0082C69C /* KBWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KBWebView.swift; sourceTree = "<group>"; };
 		D2C2440F238E44AB0082C69C /* KBWebViewBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KBWebViewBase.m; sourceTree = "<group>"; };
 		D2C24410238E44AB0082C69C /* KeyModifierPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyModifierPicker.swift; sourceTree = "<group>"; };
-		D2C2442E238E62A70082C69C /* KBSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KBSettingsViewController.swift; sourceTree = "<group>"; };
 		D2C244322390FB830082C69C /* KeyBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyBinding.swift; sourceTree = "<group>"; };
 		D2C244342390FEEF0082C69C /* KeyBindingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyBindingAction.swift; sourceTree = "<group>"; };
 		D2C24436239104250082C69C /* ShortcutsConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsConfigView.swift; sourceTree = "<group>"; };
@@ -947,6 +950,14 @@
 			path = Notifications;
 			sourceTree = "<group>";
 		};
+		804B4EAE2588B2250038BD7A /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				804B4EB62588B2390038BD7A /* BKDashboardSettingsView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
 		805CA6602577F7C900D50B47 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
@@ -955,11 +966,20 @@
 			path = SwiftUI;
 			sourceTree = "<group>";
 		};
+		809F39C7258922F6000352A3 /* Long Processes */ = {
+			isa = PBXGroup;
+			children = (
+				800EAAAB257A86CB002DF417 /* LongProcesses.swift */,
+				809F39D0258923A9000352A3 /* LongProcessesWidgets.swift */,
+			);
+			path = "Long Processes";
+			sourceTree = "<group>";
+		};
 		80D2442425728D000097793A /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
 				80D2442E25728D0F0097793A /* BKDashboard.swift */,
-				800EAAAB257A86CB002DF417 /* LongProcesses.swift */,
+				809F39C7258922F6000352A3 /* Long Processes */,
 				800EAAB5257A8737002DF417 /* HostInfo.swift */,
 				800EAAB8257A8ECC002DF417 /* TerminalCarrousel.swift */,
 				800EAACC257AA65F002DF417 /* DashboardBrain.swift */,
@@ -1111,6 +1131,7 @@
 		C9B2E0141D6B612300B89F69 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				804B4EAE2588B2250038BD7A /* Dashboard */,
 				80D2443725728E120097793A /* PortForwarding */,
 				803B99CB2582865500DC99C8 /* Notifications */,
 				B7A4876A1DC7C6F4007BA809 /* Settings */,
@@ -1329,7 +1350,6 @@
 		D2C243F7238E44960082C69C /* KB */ = {
 			isa = PBXGroup;
 			children = (
-				D2C2442A238E62690082C69C /* Controllers */,
 				D2C24400238E44AB0082C69C /* Views */,
 				D2C243F9238E44AB0082C69C /* Model */,
 			);
@@ -1384,14 +1404,6 @@
 				D2C2440B238E44AB0082C69C /* Chevron.swift */,
 			);
 			path = General;
-			sourceTree = "<group>";
-		};
-		D2C2442A238E62690082C69C /* Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				D2C2442E238E62A70082C69C /* KBSettingsViewController.swift */,
-			);
-			path = Controllers;
 			sourceTree = "<group>";
 		};
 		D2E4F92A20B2BB4500B30F7B /* Products */ = {
@@ -1754,6 +1766,7 @@
 				D2036B6323967F2F0013D2A3 /* BindingConfigView.swift in Sources */,
 				D296198D214F96D50070935A /* digest-openssl.c in Sources */,
 				D25D58102358897B00D1BCAE /* Complete.swift in Sources */,
+				809F39D1258923A9000352A3 /* LongProcessesWidgets.swift in Sources */,
 				B7D4503C1DD4706000CE0DBE /* Reachability.m in Sources */,
 				B752EE2E1DFEF45300E305C8 /* BKSecurityConfigurationViewController.m in Sources */,
 				D2F330D420A6F1DF0074ADD7 /* clear.m in Sources */,
@@ -1767,6 +1780,7 @@
 				D241CBDA23040734003D64A5 /* KBTraits.swift in Sources */,
 				B752EE2B1DFEF19D00E305C8 /* BKUserConfigurationManager.m in Sources */,
 				C9B2E0351D6B612400B89F69 /* BKSettingsFileDownloader.m in Sources */,
+				804B4EB72588B2390038BD7A /* BKDashboardSettingsView.swift in Sources */,
 				D2AB612023AB5AE000BE6585 /* UIApplication+Version.h in Sources */,
 				D241CBD823040734003D64A5 /* KBLayout.swift in Sources */,
 				D2B1F8DF23265A4700634D67 /* CommandControl.swift in Sources */,
@@ -2138,6 +2152,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				STRIP_STYLE = "non-global";
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = DASHBOARD_ENABLED;
 				SWIFT_OBJC_BRIDGING_HEADER = "Blink/Blink-bridge.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2178,6 +2193,7 @@
 				PRODUCT_NAME = Blink;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_STYLE = "non-global";
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = DASHBOARD_ENABLED;
 				SWIFT_OBJC_BRIDGING_HEADER = "Blink/Blink-bridge.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

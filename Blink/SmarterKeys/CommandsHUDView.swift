@@ -160,7 +160,7 @@ class CommandsHUGView: UIView {
     else {
       return
     }
-    
+
     let params = term.sessionParams
     params.layoutMode = _nextLayoutMode(mode: BKLayoutMode(rawValue: params.layoutMode)).rawValue
     if (params.layoutLocked) {

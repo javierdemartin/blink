@@ -66,4 +66,5 @@ struct BrainSessionData {
   var title: String?
   /// TODO: Get current proces of the terminal to show it on the carrousel
   /// TODO: Get more info to show in the Term carrousel
+  var bell: Bool = false
 }

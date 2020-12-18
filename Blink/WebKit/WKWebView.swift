@@ -96,7 +96,6 @@ class UIScrollViewWithoutHitTest: UIScrollView {
   private let _1fTapRecognizer = UITapGestureRecognizer()
   private let _2fTapRecognizer = UITapGestureRecognizer()
   private let _pinchRecognizer = UIPinchGestureRecognizer()
-  private let _3fTapRecognizer = UITapGestureRecognizer()
   private let _leftEdgeDashboardRecognizer = UIScreenEdgePanGestureRecognizer()
   private let _longPressRecognizer = UILongPressGestureRecognizer()
   private let _hoverRecognizer = UIHoverGestureRecognizer()
@@ -127,7 +126,6 @@ class UIScrollViewWithoutHitTest: UIScrollView {
     let recognizers = [
       _1fTapRecognizer,
       _2fTapRecognizer,
-      _3fTapRecognizer,
       _leftEdgeDashboardRecognizer,
       _pinchRecognizer,
       _longPressRecognizer,
@@ -198,10 +196,6 @@ class UIScrollViewWithoutHitTest: UIScrollView {
     _termScrollView.showsVerticalScrollIndicator = false
     _termScrollView.showsHorizontalScrollIndicator = false
     _termScrollView.isInfinit = true
-
-    _3fTapRecognizer.numberOfTapsRequired = 1
-    _3fTapRecognizer.numberOfTouchesRequired = 3
-    _3fTapRecognizer.delegate = self
     
     _leftEdgeDashboardRecognizer.delegate = self
     // TODO: UIScreenEdgePanGestureRecognizer doesn't seem to recognise left side's drag using a trackpad
@@ -215,7 +209,6 @@ class UIScrollViewWithoutHitTest: UIScrollView {
     _1fTapRecognizer.numberOfTouchesRequired = 1
     _1fTapRecognizer.delegate = self
     _1fTapRecognizer.addTarget(self, action: #selector(_on1fTap(_:)))
-    _1fTapRecognizer.require(toFail: _3fTapRecognizer)
     _1fTapRecognizer.require(toFail: _longPressRecognizer)
     
     _2fTapRecognizer.numberOfTapsRequired = 1

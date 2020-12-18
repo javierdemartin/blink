@@ -89,6 +89,9 @@ enum BKDashboardAction {
   case moveTo(term: UUID)
   /// Reordered tabs
   case reorderedTerms(current: UUID, ids: [BrainSessionData])
+  
+  case lockLayout
+  case unlockLayout
 }
 
 /**
@@ -96,8 +99,10 @@ enum BKDashboardAction {
  */
 enum BKDashboardConsequence {
   case geoLockStatus(status: String)
-  case screenMode(status: String)
+  case screenMode(status: ScreenLayoutWidget)
   case setActiveTerm(byId: UUID)
+  case receivedBell(on: UUID)
+  case changedTermTitle(on: UUID, title: String)
 }
 
 /**
@@ -191,8 +196,7 @@ struct BKDashboard: View {
       HostInfoView()
       
       PermanentBottomLeft(urls: $settings.urls, action: $settings.dashboardAction)
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }.frame(maxWidth: .infinity, maxHeight: .infinity)
     
   }
 }

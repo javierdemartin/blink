@@ -52,6 +52,7 @@ class SpaceController: UIViewController {
     
     let stackView = UIStackView(arrangedSubviews: [dashboardHostingController.view, terminalsCarrousel.view])
     stackView.alignment = UIStackView.Alignment.leading
+    stackView.spacing = 0.0
     stackView.axis = NSLayoutConstraint.Axis.vertical
     stackView.isHidden = false
     stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -125,7 +126,7 @@ class SpaceController: UIViewController {
         
         let term: TermController = SessionRegistry.shared[uuid]
         
-        sessions.append(BrainSessionData(id: uuid, title: term.title ?? "Blink"))
+        sessions.append(BrainSessionData(id: uuid, title: term.title))
         
       })
       
@@ -153,7 +154,9 @@ class SpaceController: UIViewController {
   }
   
   private var _hud: MBProgressHUD? = nil
+  #if !DASHBOARD_ENABLED
   private let _commandsHUD = CommandsHUGView(frame: .zero)
+  #endif
   
   private var _overlay = UIView()
   private var _spaceControllerAnimating: Bool = false
@@ -178,7 +181,9 @@ class SpaceController: UIViewController {
       _overlay.frame = view.bounds
     }
     
+    #if !DASHBOARD_ENABLED
     _commandsHUD.setNeedsLayout()
+    #endif
   }
   
   @objc func _relayout() {
@@ -204,11 +209,7 @@ class SpaceController: UIViewController {
     }
   }
   
-  public override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    _setupAppearance()
-    
+  private func sinkDashboardActions() {
     dashboardBrain.dashboardAction.sink(receiveValue: { a in
         
       switch a {
@@ -243,17 +244,15 @@ class SpaceController: UIViewController {
         
         BKDefaults.setLayoutMode(BKLayoutMode(rawValue: layoutMode)!)
         BKDefaults.save()
-        
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: BKAppearanceChanged), object: self)
-        
-        self.dashboardBrain.dashboardConsecuence.send(.screenMode(status: ScreenAppearanceTranslator(rawValue: layoutMode)!.description))
+        self.dashboardBrain.dashboardConsecuence.send(.screenMode(status: ScreenLayoutWidget(rawValue: layoutMode)!))
       case .pasteOnTerm(text: let contents):
         self.currentTerm()?.termDevice.write(contents)
       case .moveTo(term: let term):
         self._moveToShell(key: term, animated: true)
       case .reorderedTerms(current: let key, ids: let ids):
         
-        self._viewportsKeys = ids.flatMap({ $0.id })
+        self._viewportsKeys = ids.compactMap({ $0.id })
         self._currentKey = key
         
         /**
@@ -269,9 +268,26 @@ class SpaceController: UIViewController {
           self._viewportsController.dataSource = nil
           self._viewportsController.dataSource = self
         }
+        
+      case .lockLayout:
+        self.currentTerm()?.lockLayout()
+      case .unlockLayout:
+        self.currentTerm()?.unlockLayout()
       }
       
     }).store(in: &cancellableBag)
+  }
+  
+  public override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    _setupAppearance()
+    
+    
+    #if DASHBOARD_ENABLED
+    sinkDashboardActions()
+    #endif
+    
     
     view.isOpaque = true
     
@@ -294,7 +310,9 @@ class SpaceController: UIViewController {
     _overlay.isUserInteractionEnabled = false
     view.addSubview(_overlay)
     
+    #if !DASHBOARD_ENABLED
     _commandsHUD.delegate = self
+    #endif
     _registerForNotifications()
     
     if _viewportsKeys.isEmpty {
@@ -306,6 +324,8 @@ class SpaceController: UIViewController {
       term.bgColor = view.backgroundColor ?? .black
       _viewportsController.setViewControllers([term], direction: .forward, animated: false)
     }
+    
+    #if DASHBOARD_ENABLED
     
     let hideGesture = UIPanGestureRecognizer(target: self, action: #selector(handleDashboardGesture(_:)))
     hideGesture.allowedScrollTypesMask = .all
@@ -350,6 +370,10 @@ class SpaceController: UIViewController {
     
     /// Hide the Dashboard on first appearance
     showDashboardProgramatically()
+      
+    #endif
+    
+    
   }
   
   public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -397,7 +421,9 @@ class SpaceController: UIViewController {
       sceneRole == .windowApplication,
       let win = view.window?.windowScene?.windows.last,
       win !== view.window {
+      #if !DASHBOARD_ENABLED
       _commandsHUD.attachToWindow(inputWindow: win)
+      #endif
     }
   }
   
@@ -416,7 +442,8 @@ class SpaceController: UIViewController {
   func _createShell(
     userActivity: NSUserActivity?,
     animated: Bool,
-    completion: ((Bool) -> Void)? = nil)
+    completion: ((Bool) ->
+                 Void)? = nil)
   {
     let term = TermController(sceneRole: sceneRole)
     term.delegate = self
@@ -595,7 +622,9 @@ class SpaceController: UIViewController {
     hud.hide(animated: true, afterDelay: 1)
     
     view.window?.windowScene?.title = sceneTitle
+    #if !DASHBOARD_ENABLED
     _commandsHUD.updateHUD()
+    #endif
     
     // Triggered on each terminal screen to detect possible new links to interact with
     _getInterestingLinks()
@@ -687,6 +716,15 @@ extension SpaceController: UIPageViewControllerDataSource {
 
 extension SpaceController: TermControlDelegate {
   
+  func updatedTitle(id: UUID, title: String) {
+    dashboardBrain.dashboardConsecuence.send(.changedTermTitle(on: id, title: title))
+  }
+  
+  func termReceivedBell(id: UUID) {
+    dashboardBrain.dashboardConsecuence.send(.receivedBell(on: id))
+  }
+  
+  
   func terminalHangup(control: TermController) {
     if currentTerm() == control {
       _closeCurrentSpace()
@@ -698,6 +736,8 @@ extension SpaceController: TermControlDelegate {
       _displayHUD()
     }
   }
+  
+  
 }
 
 // MARK: General tunning
@@ -1136,6 +1176,8 @@ extension SpaceController {
    Called whenever a tab comes on/goes scope to display intersting links. The obtained URLs are
    */
   private func _getInterestingLinks() {
+    
+    
     self.currentTerm()?.termDevice.view?.getInterestingLinks({ result in
       
       guard let result = result else { return }

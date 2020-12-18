@@ -32,6 +32,7 @@
 import SwiftUI
 import Combine
 
+
 struct DownloadProcessBarView: View {
   @Binding var progress: Float
   
@@ -73,17 +74,24 @@ struct DownloadProcessBarView: View {
  */
 struct LongProcessesView: View {
   
-  var cancellableBag: Set<AnyCancellable> = []
+  private var cancellableBag: Set<AnyCancellable> = []
+  
+  @ObservedObject var viewModel = LongProcessesViewModel()
   
   @EnvironmentObject var settings: DashboardBrain
   
-  @State var geoLockMessage: String?
-  
   @State var progressValue: Float = 0.0
   
-  @State var screenMode: String?
-  
   @State var isImporting: Bool = false
+  
+  @State var lockWidgetStatus: LockScren = LockScren.lock
+  @State var lockHidden: Bool = true
+  
+  @State var geoWidgetStatus: GeoStatus = .stopped
+  @State var geoHidden: Bool = true
+  
+  @State var screenModeStatus: ScreenLayoutWidget = ScreenLayoutWidget(rawValue: BKDefaults.layoutMode().rawValue)!
+  @State var screenHidden: Bool = true
   
   var body: some View {
     
@@ -136,74 +144,61 @@ struct LongProcessesView: View {
       Button {
         withAnimation {
           
+          geoHidden = false
+          
           settings.dashboardAction.send(.geoLock)
+          
+          if geoWidgetStatus == .tracking {
+            geoWidgetStatus = .stopped
+          } else if geoWidgetStatus == .stopped {
+            geoWidgetStatus = .tracking
+          }
+          
           dismissHUDAfterTime(completion: {
-            geoLockMessage = nil
+            hideHudElements()
           })
         }
       } label: {
-        ZStack {
-          HStack {
-            
-            Image(systemName: "location.viewfinder")
-              .modifier(ImageStyle())
-              .padding()
-            
-            if geoLockMessage != nil {
-              VStack(alignment: .leading) {
-                
-                Text("Geo Persistence".uppercased())
-                  .foregroundColor(BKDashboardColor.textColor)
-                  .fontWeight(.bold)
-                  .font(.system(.caption, design: .rounded))
-                
-                Text(geoLockMessage!)
-                  .bold()
-                  .foregroundColor(BKDashboardColor.textColor)
-                  .padding(.trailing)
-                
-                
-              }.padding(.trailing)
-            }
-          }
-        }
-        .foregroundColor((GeoManager.shared().traking) ? BKDashboardColor.tint : .gray)
+        LongProcessWidgetView(widget: $geoWidgetStatus.asParameter, hiddenText: $geoHidden)
+          .foregroundColor((GeoManager.shared().traking) ? BKDashboardColor.tint : .gray)
+       
       }
       .modifier(LongProcessModule())
       .animation(.easeInOut)
       
+      Button {
+        withAnimation {
+          
+          lockHidden = false
+          
+          if lockWidgetStatus == .lock {
+            lockWidgetStatus = .unlock
+            settings.dashboardAction.send(.lockLayout)
+
+          } else {
+            lockWidgetStatus = .unlock
+            settings.dashboardAction.send(.unlockLayout)
+          }
+        }
+      } label: {
+        LongProcessWidgetView(widget: $lockWidgetStatus.asParameter, hiddenText: $lockHidden)
+      }
+      .modifier(LongProcessModule())
+      .animation(.easeInOut)
+      .accessibilityLabel(Text(lockWidgetStatus.accesibilityLabel))
       
       Button {
         withAnimation {
+          
+          screenHidden = false
+          
           settings.dashboardAction.send(.iterateScreenMode)
           dismissHUDAfterTime(completion: {
-            screenMode = nil
+            hideHudElements()
           })
         }
-        
       } label: {
-        ZStack {
-          HStack(alignment: .center) {
-            Image(systemName: "rectangle.and.arrow.up.right.and.arrow.down.left")
-              .modifier(ImageStyle())
-              .padding()
-            
-            if screenMode != nil {
-              VStack(alignment: .leading) {
-                Text("Screen Layout".uppercased())
-                  .foregroundColor(BKDashboardColor.textColor)
-                  .fontWeight(.bold)
-                  .font(.system(.caption, design: .rounded))
-                
-                Text(screenMode!)
-                  .bold()
-                  .foregroundColor(BKDashboardColor.textColor)
-                  .padding(.trailing)
-                
-              }.padding(.trailing)
-            }
-          }
-        }
+        LongProcessWidgetView(widget: $screenModeStatus.asParameter, hiddenText: $screenHidden)
       }
       .modifier(LongProcessModule())
       .animation(.easeInOut)
@@ -213,10 +208,11 @@ struct LongProcessesView: View {
       switch a {
       
       case .geoLockStatus(status: let status):
-        geoLockMessage = status
-        
+//        geoLockMessage = status
+        break
       case .screenMode(status: let status):
-        screenMode = status
+        screenModeStatus = status
+        break
         
       default: break
       }
@@ -224,15 +220,67 @@ struct LongProcessesView: View {
     .animation(.linear)
   }
   
-  func dismissAnimation() {
-    screenMode = nil
+  func dismissHUDAfterTime(completion: @escaping(() -> Void)) {
+    viewModel.dismiss(comp: {
+      completion()
+    })
   }
   
-  // TODO: Make it cancel when multiple taps are performed
-  func dismissHUDAfterTime(completion: @escaping(() -> Void)) {
+  /// Setting the HUD elements to `nil` hides them
+  func hideHudElements() {
     
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-      completion()
+    geoHidden = true
+    screenHidden = true
+    lockHidden = true
+    screenHidden = true
+  }
+}
+
+struct LongProcessWidgetView: View {
+  
+  @Binding var widget: LongProcessWidget
+  @Binding var hiddenText: Bool
+
+  var body: some View {
+    ZStack {
+      HStack(alignment: .center) {
+        Image(systemName: widget.imageName)
+          .modifier(ImageStyle())
+          .padding()
+        
+        
+        if !hiddenText {
+          VStack(alignment: .leading) {
+            Text(widget.title.uppercased())
+              .foregroundColor(BKDashboardColor.textColor)
+              .fontWeight(.bold)
+              .font(.system(.caption, design: .rounded))
+           
+            Text(widget.subtitle)
+              .bold()
+              .foregroundColor(BKDashboardColor.textColor)
+              .padding(.trailing)
+          }.padding(.trailing)
+        }
+        
+      }
+    }
+  }
+}
+
+class LongProcessesViewModel: ObservableObject {
+
+  private var workItem: DispatchWorkItem?
+  
+  func dismiss(comp: @escaping(() -> Void)) {
+    workItem?.cancel()
+    
+    workItem = DispatchWorkItem {
+      comp()
+    }
+    
+    if let workItem = self.workItem {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: workItem)
     }
   }
 }

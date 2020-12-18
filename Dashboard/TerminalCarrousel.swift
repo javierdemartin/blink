@@ -34,41 +34,6 @@ import Combine
 import UniformTypeIdentifiers
 
 /**
- Overlapping view on top of a `TabView` that displays session's data
- */
-struct CarrouselData: View {
-  
-  /// Protocol being used
-  @State var proto: String = "ssh"
-  @State var host: String = "javier.blink.zone"
-  @State var process: String = "node server.js -p 3000"
-  
-  @Binding var data: BrainSessionData
-  
-  var body: some View {
-    VStack(alignment: .leading) {
-      
-      HStack {
-        ProtocolSession(networkProtocol: $proto)
-        Text(host)
-          .font(.footnote)
-          .foregroundColor(BKDashboardColor.lightText)
-        
-        Spacer()
-      }
-      
-//      Text(process)
-      Text(data.title!)
-        .foregroundColor(BKDashboardColor.textColor)
-        .lineLimit(1)
-        .padding(.vertical, 3)
-    }
-    .padding(6)
-    .background(BKDashboardColor.carrousel)
-  }
-}
-
-/**
  Matches `TabView` sizing but it's an empty view that allows tapping on it to open a new `TerminalController`
  */
 struct NewSessionView: View {
@@ -110,21 +75,17 @@ struct TabView: View {
   
   @Binding var activeSession: UUID?
   
-  @State var bellRing: Bool = true
-  
   var isActive: Bool {
     get {
-      return uuid.id == (activeSession ?? UUID())
+      return currentSession.id == (activeSession ?? UUID())
     }
   }
   
-  /**
-   
-   */
   var action = PassthroughSubject<BKDashboardAction, Never>()
   
-//  @Binding var uuid: UUID
-  @Binding var uuid: BrainSessionData
+  @Binding var currentSession: BrainSessionData
+  // TODO: Detect protocol in use
+  @State var proto: String = "ssh"
   
   var body: some View {
     
@@ -132,11 +93,10 @@ struct TabView: View {
       
       VStack(alignment: .leading) {
         
-        if bellRing {
           HStack {
             
             Button(action: {
-              action.send(.closeTab(id: uuid.id))
+              action.send(.closeTab(id: currentSession.id))
             }) {
               Image(systemName: "multiply")
                 .foregroundColor(BKDashboardColor.lightText)
@@ -148,13 +108,33 @@ struct TabView: View {
             Image(systemName: "bell.badge")
               .foregroundColor(.red)
               .padding(6)
+              .opacity(currentSession.bell ? 1.0 : 0.0)
           }
-        }
         
         Spacer()
         
         ZStack(alignment: .bottom) {
-          CarrouselData(data: $uuid)
+          VStack(alignment: .leading) {
+            
+            HStack {
+              ProtocolSession(networkProtocol: $proto)
+//              Text(host)
+                .font(.footnote)
+                .foregroundColor(BKDashboardColor.lightText)
+              
+              Spacer()
+            }
+            
+            Spacer()
+            
+            Text(currentSession.title ?? "Blink")
+              .foregroundColor(BKDashboardColor.textColor)
+              .lineLimit(1)
+              .padding(.vertical, 3)
+            
+          }
+          .padding(6)
+          .background(BKDashboardColor.carrousel)
         }
         .frame(height: g.size.height * 0.35)
       }
@@ -175,6 +155,8 @@ struct TabView: View {
   }
 }
 
+// TODO: Drag each `TabView` onto a new window
+
 /**
  Horizontal ScrollView containing the available terminals.
  */
@@ -183,35 +165,20 @@ struct TerminalsCarrousel: View {
   @EnvironmentObject var data: DashboardBrain
   @Namespace var nameSpace
   
-  /**
-   Default horizontal, Switches between tab overview.
-   */
-  @State var columns = [GridItem(.flexible(minimum: 250), spacing: 10)]
-  
   @ObservedObject var dragStatus = SelectionStore()
-  
-  @State private var currentAmount: CGFloat = 0
-  @State private var finalAmount: CGFloat = 1
   
   var body: some View {
     
     ZStack {
       
-      if columns.count > 1 {
-        EffectsView(material: UIBlurEffect(style: .systemMaterial))
-      }
-      
       ScrollView(.horizontal, showsIndicators: false) {
-        
-        VStack {
           
-//          HStack {
-          LazyHGrid(rows: columns, alignment: .center, spacing: 20) {
+          HStack {
             
             ForEach(0..<data.activeTerminalControllers.count, id: \.self) { term in
               TabView(activeSession: $data.activeSession,
                       action: self.data.dashboardAction,
-                      uuid: $data.activeTerminalControllers[term])
+                      currentSession: $data.activeTerminalControllers[term])
                 .matchedGeometryEffect(id: data.activeTerminalControllers[term].id, in: nameSpace)
                 
                 .onTapGesture {
@@ -230,25 +197,10 @@ struct TerminalsCarrousel: View {
                   dragStatus.dragging = nil
                   data.dashboardAction.send(.reorderedTerms(current: id, ids: data.activeTerminalControllers))
                 }))
-              
             }
             
             NewSessionView(action: self.data.dashboardAction)
           }
-          /**
-           TODO: This is a WIP, do a Pinch gesture on the `"+"` (NewSession) to switch between the Terminals carrousel and a square grid like
-           in Safari when previewing all of the open tabs. It works but not as performant with a lot of tabs open due to LazyGrids. Maybe it's better not to implement this and stick to a simple HStack adn no square grid.
-           
-           The pinch gesture switches the LazyGrid layout filling the whole screen.
-           
-           */
-          .gesture(
-            MagnificationGesture()
-              .onEnded { amount in
-                columns = Array(repeating: GridItem(.flexible(minimum: 250), spacing: 10), count: 4)
-              })
-          .animation(.default)
-        }
       }
     }
     .onReceive(data.dashboardConsecuence, perform: { action in
@@ -256,6 +208,20 @@ struct TerminalsCarrousel: View {
       
       case .setActiveTerm(byId: let uuid):
         data.activeSession = uuid
+      case .receivedBell(on: let uuid):
+        
+        guard let index = data.activeTerminalControllers.firstIndex(where: { $0.id == uuid }) else {
+          return
+        }
+        
+        data.activeTerminalControllers[index].bell = true
+        
+      case .changedTermTitle(on: let uuid, title: let title):
+        guard let index = data.activeTerminalControllers.firstIndex(where: { $0.id == uuid }) else {
+          return
+        }
+        
+        data.activeTerminalControllers[index].title = title
         
       default: break
       }
@@ -269,7 +235,6 @@ struct TerminalsCarrousel: View {
 struct DragRelocateDelegate: DropDelegate {
   /// Current terminal identifier that has started a Drag operation
   let item: UUID
-//  @Binding var listData: [UUID]
   @Binding var listData: [BrainSessionData]
   @Binding var current: UUID?
   @Binding var isInside: Bool
