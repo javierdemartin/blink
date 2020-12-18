@@ -31,8 +31,15 @@
 
 
 import MBProgressHUD
+import SwiftUI
 
 class SpaceController: UIViewController {
+  
+  #if COMMUNITY_BLOCKER_ENABLED
+  let blocker = CommunityBlocker()
+  #endif
+  
+  let childView = UIHostingController(rootView: CommunityBlockerView())
   
   struct UIState: UserActivityCodable {
     var keys: [UUID] = []
@@ -110,10 +117,13 @@ class SpaceController: UIViewController {
     
     view.isOpaque = true
     
+    #if COMMUNITY_BLOCKER_ENABLED
+    blocker.delegate = self
+    #endif
+    
     _viewportsController.view.isOpaque = true
     _viewportsController.dataSource = self
     _viewportsController.delegate = self
-    
     
     addChild(_viewportsController)
     
@@ -836,3 +846,47 @@ extension SpaceController: CommandsHUDViewDelegate {
   
   @objc func spaceController() -> SpaceController? { self }
 }
+
+// MARK: - CommunityBlockerDelegate
+
+#if COMMUNITY_BLOCKER_ENABLED
+extension SpaceController: CommunityBlockerDelegate {
+  func removeCommunityBlockerAfterTime() {
+    UIView.animate(withDuration: blocker.dismissDuration, animations: {
+      self.childView.view.removeFromSuperview()
+      self.view.subviews.forEach({
+        $0.layer.opacity = 1.0
+      })
+    }, completion: { finished in
+      self.blocker.userAskedForMoreTime()
+    })
+  }
+  
+  func startFading() {
+    UIView.animate(withDuration: blocker.fadingDuration, animations: {
+      self.view.subviews.forEach({
+        $0.layer.opacity = 0.3
+      })
+    }, completion: { finished in
+      
+      self.view.addSubview(self.childView.view)
+      self.childView.view.frame = self.view.frame
+      self.childView.view.backgroundColor = .clear
+      self.childView.didMove(toParent: self)
+      self.view.bringSubviewToFront(self.childView.view)
+      self.blocker.startAutomaticDismissalTimer()
+      // Don't let the user interact with the terminal when the banner is up
+      // Dismisses the keyboard if using software keyboard
+      self.view.endEditing(true)
+      
+    })
+  }
+  
+  // Enable detection of shake motion
+  override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+      if motion == .motionShake {
+        removeCommunityBlockerAfterTime()
+      }
+  }
+}
+#endif
