@@ -30,25 +30,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Blink_bridge_h
-#define Blink_bridge_h
+import Foundation
+import StoreKit
 
-#import "BKDefaults.h"
-#import "BKHosts.h"
-#import "BlinkPaths.h"
-#import "DeviceInfo.h"
-#import "LayoutManager.h"
-#import "BKUserConfigurationManager.h"
-#import "Session.h"
-#import "MCPSession.h"
-#import "TermDevice.h"
-#import "KBWebViewBase.h"
-#import "openurl.h"
-#import "openssl-compat.h"
-#import <openssl/pkcs7.h>
-#import <openssl/objects.h>
-#import <openssl/x509.h>
-#import <openssl/crypto.h>
-#import <openssl/ssl.h>
+// TODO: - Add the available products from App Store Connect
+public struct StoreKitProducts {
+    
+    public static let FirstProduct = "Com.CarlosCabanero.BlinkShell.suscription_level_1"
+    public static let SecondProduct = "Com.CarlosCabanero.BlinkShellNew.MonthlyTier"
+    public static let ThirdProduct = "Com.CarlosCabanero.BlinkShell.suscription_level_2"
+    public static let FourthProduct = "Com.CarlosCabanero.BlinkShell.unlock_all"
+    
+    private static let productIdentifiers: Set<ProductIdentifier> = [StoreKitProducts.SecondProduct, StoreKitProducts.ThirdProduct, StoreKitProducts.FourthProduct]
+    
+    public static let store = IAPHelper(productIds: StoreKitProducts.productIdentifiers)
+}
 
-#endif /* Blink_bridge_h */
+struct BKPurchase: Identifiable {
+    var id = UUID()
+    var localizedTitle: String
+    var identifier: String
+    var skProd: SKProduct
+}
+

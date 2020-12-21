@@ -40,6 +40,14 @@
 		22E1F3362036EE87001FCC5C /* libssh2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22E1F3342036EE86001FCC5C /* libssh2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		803B99D72582869200DC99C8 /* BKNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99D62582869200DC99C8 /* BKNotificationsView.swift */; };
 		803B99E3258381B200DC99C8 /* SettingsHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803B99E2258381B200DC99C8 /* SettingsHostingController.swift */; };
+		80CF2F6F258FF29B0059EED9 /* StoreKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CF2F6E258FF29B0059EED9 /* StoreKitHelper.swift */; };
+		80CF2FAF2590A5AB0059EED9 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 80CF2FAE2590A5AB0059EED9 /* AppleIncRootCertificate.cer */; };
+		80CF2FB32590A8090059EED9 /* ASN1Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CF2FB22590A8090059EED9 /* ASN1Helpers.swift */; };
+		80CF2FB62590A8550059EED9 /* IAPPurchases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CF2FB52590A8550059EED9 /* IAPPurchases.swift */; };
+		80CF2FBA2590B16F0059EED9 /* SubscriptionsManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CF2FB92590B16F0059EED9 /* SubscriptionsManagementView.swift */; };
+		80CF2FC12590B3820059EED9 /* StoreKitProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CF2FC02590B3820059EED9 /* StoreKitProducts.swift */; };
+		80CF2FC42590B4210059EED9 /* IAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CF2FC32590B4210059EED9 /* IAPHelper.swift */; };
+		80CF2FC72590EDD50059EED9 /* SKProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80CF2FC62590EDD50059EED9 /* SKProduct.swift */; };
 		85A34307200A837A009324F1 /* webfontloader.js in Resources */ = {isa = PBXBuildFile; fileRef = 85A34303200A837A009324F1 /* webfontloader.js */; };
 		85A34309200A8FAF009324F1 /* term.css in Resources */ = {isa = PBXBuildFile; fileRef = 85A34308200A8FAF009324F1 /* term.css */; };
 		B700AED81DD0F2C200100EBF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B700AED71DD0F2C200100EBF /* CloudKit.framework */; };
@@ -301,6 +309,13 @@
 			remoteGlobalIDString = 148993CF1D8F2515000132F7;
 			remoteInfo = TestHost;
 		};
+		80CF2F6C258FF2900059EED9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0732F1101D062C9F00AB5438 /* UICKeyChainStore.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 80FC965B252C6209006CF96B;
+			remoteInfo = BlinkShellIntents;
+		};
 		D24AFD5A222410E700CFD3C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0732F1051D062BF700AB5438 /* MBProgressHUD.xcodeproj */;
@@ -404,6 +419,14 @@
 		22E1F3342036EE86001FCC5C /* libssh2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libssh2.framework; sourceTree = "<group>"; };
 		803B99D62582869200DC99C8 /* BKNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BKNotificationsView.swift; sourceTree = "<group>"; };
 		803B99E2258381B200DC99C8 /* SettingsHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostingController.swift; sourceTree = "<group>"; };
+		80CF2F6E258FF29B0059EED9 /* StoreKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitHelper.swift; sourceTree = "<group>"; };
+		80CF2FAE2590A5AB0059EED9 /* AppleIncRootCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleIncRootCertificate.cer; sourceTree = "<group>"; };
+		80CF2FB22590A8090059EED9 /* ASN1Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASN1Helpers.swift; sourceTree = "<group>"; };
+		80CF2FB52590A8550059EED9 /* IAPPurchases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPPurchases.swift; sourceTree = "<group>"; };
+		80CF2FB92590B16F0059EED9 /* SubscriptionsManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsManagementView.swift; sourceTree = "<group>"; };
+		80CF2FC02590B3820059EED9 /* StoreKitProducts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitProducts.swift; sourceTree = "<group>"; };
+		80CF2FC32590B4210059EED9 /* IAPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPHelper.swift; sourceTree = "<group>"; };
+		80CF2FC62590EDD50059EED9 /* SKProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKProduct.swift; sourceTree = "<group>"; };
 		85A34303200A837A009324F1 /* webfontloader.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = webfontloader.js; sourceTree = "<group>"; };
 		85A34308200A8FAF009324F1 /* term.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = term.css; sourceTree = "<group>"; };
 		B700AED71DD0F2C200100EBF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -779,6 +802,7 @@
 		0732F0481D062B9A00AB5438 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				80CF2FAE2590A5AB0059EED9 /* AppleIncRootCertificate.cer */,
 				D21A3FC521943BE200269705 /* DarkAppIcon */,
 				D29FE548208DC860004679D0 /* commandDictionary.plist */,
 				D2C21F3220FCD6CD00F125E0 /* blinkCommandsDictionary.plist */,
@@ -864,6 +888,7 @@
 				0732F1191D062CA000AB5438 /* libUICKeyChainStore.a */,
 				0732F11B1D062CA000AB5438 /* UICKeyChainStoreTests.xctest */,
 				0747D63E2018182D00CF8F0C /* TestHost.app */,
+				80CF2F6D258FF2900059EED9 /* BlinkShellIntents.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -917,6 +942,26 @@
 				803B99D62582869200DC99C8 /* BKNotificationsView.swift */,
 			);
 			path = Notifications;
+			sourceTree = "<group>";
+		};
+		80CF2F64258FF2900059EED9 /* Receipt */ = {
+			isa = PBXGroup;
+			children = (
+				80CF2F6E258FF29B0059EED9 /* StoreKitHelper.swift */,
+				80CF2FB22590A8090059EED9 /* ASN1Helpers.swift */,
+				80CF2FB52590A8550059EED9 /* IAPPurchases.swift */,
+				80CF2FC02590B3820059EED9 /* StoreKitProducts.swift */,
+				80CF2FC32590B4210059EED9 /* IAPHelper.swift */,
+			);
+			path = Receipt;
+			sourceTree = "<group>";
+		};
+		80CF2FB82590B0C80059EED9 /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				80CF2FB92590B16F0059EED9 /* SubscriptionsManagementView.swift */,
+			);
+			path = Subscriptions;
 			sourceTree = "<group>";
 		};
 		B75112C71DE4A7680040C693 /* UserConfiguration */ = {
@@ -1007,6 +1052,7 @@
 		C9B2E0031D6B612300B89F69 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				80CF2FB82590B0C80059EED9 /* Subscriptions */,
 				C94E9B611D6BA21C00DA4DD6 /* DismissSegue.h */,
 				C94E9B621D6BA21C00DA4DD6 /* DismissSegue.m */,
 				C9B2E0041D6B612300B89F69 /* Settings.storyboard */,
@@ -1174,6 +1220,7 @@
 			isa = PBXGroup;
 			children = (
 				D265FBC8231905AC0017EAC4 /* NSCoder+CodingKey.swift */,
+				80CF2FC62590EDD50059EED9 /* SKProduct.swift */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -1362,6 +1409,7 @@
 		EA0BA1821C0CC57B00719C1A = {
 			isa = PBXGroup;
 			children = (
+				80CF2F64258FF2900059EED9 /* Receipt */,
 				D2C243F7238E44960082C69C /* KB */,
 				C9B2E0031D6B612300B89F69 /* Settings */,
 				D265FBBB2317DD3C0017EAC4 /* BlinkTests */,
@@ -1554,6 +1602,13 @@
 			remoteRef = 0747D63D2018182D00CF8F0C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		80CF2F6D258FF2900059EED9 /* BlinkShellIntents.appex */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.app-extension";
+			path = BlinkShellIntents.appex;
+			remoteRef = 80CF2F6C258FF2900059EED9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		D2A3F4DD206909A8006BB305 /* MBProgressHUD.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -1619,6 +1674,7 @@
 				D21A3FE721943BE200269705 /* dark-app-ipad-76pt@2x.png in Resources */,
 				C9B2E02F1D6B612400B89F69 /* Settings.storyboard in Resources */,
 				D2496F3F20038B3300E75FE9 /* hterm_all.min.js in Resources */,
+				80CF2FAF2590A5AB0059EED9 /* AppleIncRootCertificate.cer in Resources */,
 				D21A3FDB21943BE200269705 /* dark-settings-ipad-29pt@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1679,17 +1735,20 @@
 				B7D4503C1DD4706000CE0DBE /* Reachability.m in Sources */,
 				B752EE2E1DFEF45300E305C8 /* BKSecurityConfigurationViewController.m in Sources */,
 				D2F330D420A6F1DF0074ADD7 /* clear.m in Sources */,
+				80CF2FB32590A8090059EED9 /* ASN1Helpers.swift in Sources */,
 				C94437571D8311960096F84E /* BKResource.m in Sources */,
 				D2CF27292428A791009885ED /* KBTracker.swift in Sources */,
 				07F670771D05EEE200C0A53C /* SSHSession.m in Sources */,
 				D241CBD323040734003D64A5 /* KBSound.swift in Sources */,
 				D29619AF214FB5EA0070935A /* ssh-ecdsa.c in Sources */,
 				07F670761D05EEE200C0A53C /* SSHCopyIDSession.m in Sources */,
+				80CF2F6F258FF29B0059EED9 /* StoreKitHelper.swift in Sources */,
 				D2C244352390FEEF0082C69C /* KeyBindingAction.swift in Sources */,
 				D241CBDA23040734003D64A5 /* KBTraits.swift in Sources */,
 				B752EE2B1DFEF19D00E305C8 /* BKUserConfigurationManager.m in Sources */,
 				C9B2E0351D6B612400B89F69 /* BKSettingsFileDownloader.m in Sources */,
 				D2AB612023AB5AE000BE6585 /* UIApplication+Version.h in Sources */,
+				80CF2FC42590B4210059EED9 /* IAPHelper.swift in Sources */,
 				D241CBD823040734003D64A5 /* KBLayout.swift in Sources */,
 				D2B1F8DF23265A4700634D67 /* CommandControl.swift in Sources */,
 				D2A52227231304FF0010AC04 /* UIGestureRecognizer.swift in Sources */,
@@ -1698,8 +1757,10 @@
 				D296199D214F995D0070935A /* hash.c in Sources */,
 				D2071B812150FFD1000156D7 /* match.c in Sources */,
 				D2C24425238E44AB0082C69C /* KeyModifierPicker.swift in Sources */,
+				80CF2FB62590A8550059EED9 /* IAPPurchases.swift in Sources */,
 				C989E5561D6CC4A1003E0079 /* BKAppearanceViewController.m in Sources */,
 				D2D8DD9823C8506900BFF223 /* LockView.swift in Sources */,
+				80CF2FC12590B3820059EED9 /* StoreKitProducts.swift in Sources */,
 				C989E54B1D6CC488003E0079 /* BKHostsViewController.m in Sources */,
 				B7A487691DC7C48D007BA809 /* UIDevice+DeviceName.m in Sources */,
 				D2071B732150E4AA000156D7 /* ssh-add.m in Sources */,
@@ -1749,6 +1810,7 @@
 				D2ED4A6F239BB12E000DC67F /* KeyCaptureView.swift in Sources */,
 				D29D6C3122DB9CA700A84173 /* TermController.swift in Sources */,
 				D23E142B20A970C3000FCF5C /* BlinkPaths.m in Sources */,
+				80CF2FBA2590B16F0059EED9 /* SubscriptionsManagementView.swift in Sources */,
 				D2D6D78620527651003CBEC4 /* TermDevice.m in Sources */,
 				D2D8DD8523C71CC500BFF223 /* LocalAuth.swift in Sources */,
 				D296199C214F995D0070935A /* ed25519.c in Sources */,
@@ -1766,6 +1828,7 @@
 				D248E67622DDDF130057FE67 /* UIStateRestorable.swift in Sources */,
 				C9B2E0341D6B612400B89F69 /* BKTheme.m in Sources */,
 				D29619A7214FA7D40070935A /* bcrypt-pbkdf.c in Sources */,
+				80CF2FC72590EDD50059EED9 /* SKProduct.swift in Sources */,
 				D241CBD123040734003D64A5 /* KBKeyViewArrows.swift in Sources */,
 				C989E5671D6CC95A003E0079 /* BKPubKeyViewController.m in Sources */,
 				D2334D1D21495DAE00D26AC3 /* host2ip.c in Sources */,

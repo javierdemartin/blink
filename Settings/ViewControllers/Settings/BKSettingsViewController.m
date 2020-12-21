@@ -106,6 +106,9 @@
   } else if (indexPath.section == 1 && indexPath.row == 3) {
     UIViewController *vc = [SettingsHostingController createNotificationsWithNav:self.navigationController];
     [self.navigationController pushViewController:vc animated:YES];
+  } else if (indexPath.section == 5 && indexPath.row == 0) {
+    UIViewController *vc = [SettingsHostingController createSubscriptionWithNavWithNav:self.navigationController];
+    [self.navigationController pushViewController:vc animated:YES];
   }
 }
 

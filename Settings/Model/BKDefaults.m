@@ -65,6 +65,7 @@ NSString *const BKAppearanceChanged = @"BKAppearanceChanged";
   _notificationOnBellUnfocused = [coder decodeBoolForKey:@"notificationOnBellUnfocused"];
   _hapticFeedbackOnBellOff = [coder decodeBoolForKey:@"hapticFeedbackOnBellOff"];
   _oscNotifications = [coder decodeBoolForKey:@"oscNotifications"];
+  _activeSubscription = [coder decodeObjectForKey:@"activeSubscription"];
   
   return self;
 }
@@ -91,6 +92,7 @@ NSString *const BKAppearanceChanged = @"BKAppearanceChanged";
   [encoder encodeBool:_notificationOnBellUnfocused forKey:@"notificationOnBellUnfocused"];
   [encoder encodeBool:_hapticFeedbackOnBellOff forKey:@"hapticFeedbackOnBellOff"];
   [encoder encodeBool:_oscNotifications forKey:@"oscNotifications"];
+  [encoder encodeObject:_activeSubscription forKey:@"activeSubscription"];
 }
 
 + (void)loadDefaults
@@ -228,6 +230,10 @@ NSString *const BKAppearanceChanged = @"BKAppearanceChanged";
   defaults.oscNotifications = state;
 }
 
++ (void)setActiveSubscription:(NSString *)activeSubscription {
+  defaults.activeSubscription = activeSubscription;
+}
+
 + (NSString *)selectedFontName
 {
   return defaults.fontName;
@@ -319,6 +325,10 @@ NSString *const BKAppearanceChanged = @"BKAppearanceChanged";
 
 + (BOOL)isOscNotificationsOn {
   return defaults.oscNotifications;
+}
+
++ (NSString *)getActiveSubscriptionIdentifier {
+  return defaults.activeSubscription;
 }
 
 + (void)applyExternalScreenCompensation:(BKOverscanCompensation)value {

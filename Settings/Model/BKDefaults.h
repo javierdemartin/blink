@@ -75,6 +75,7 @@ typedef NS_ENUM(NSInteger, BKKeyboardStyle) {
 @property (nonatomic) BOOL notificationOnBellUnfocused;
 @property (nonatomic) BOOL hapticFeedbackOnBellOff;
 @property (nonatomic) BOOL oscNotifications;
+@property (nonatomic) NSString *activeSubscription;
 
 + (void)loadDefaults;
 + (BOOL)saveDefaults;
@@ -95,6 +96,7 @@ typedef NS_ENUM(NSInteger, BKKeyboardStyle) {
 + (void)setNotificationOnBellUnfocused:(BOOL)state;
 + (void)setHapticFeedbackOnBellOff:(BOOL)state;
 + (void)setOscNotifications:(BOOL)state;
++ (void)setActiveSubscription:(NSString *)activeSubscription;
 + (NSString *)selectedFontName;
 + (NSString *)selectedThemeName;
 + (NSNumber *)selectedFontSize;
@@ -119,6 +121,7 @@ typedef NS_ENUM(NSInteger, BKKeyboardStyle) {
 + (BOOL)isNotificationOnBellUnfocusedOn;
 + (BOOL)hapticFeedbackOnBellOff;
 + (BOOL)isOscNotificationsOn;
++ (NSString *)getActiveSubscriptionIdentifier;
 
 + (void)applyExternalScreenCompensation:(BKOverscanCompensation)value;
 @end

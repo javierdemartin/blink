@@ -30,25 +30,28 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Blink_bridge_h
-#define Blink_bridge_h
+import Foundation
+import StoreKit
 
-#import "BKDefaults.h"
-#import "BKHosts.h"
-#import "BlinkPaths.h"
-#import "DeviceInfo.h"
-#import "LayoutManager.h"
-#import "BKUserConfigurationManager.h"
-#import "Session.h"
-#import "MCPSession.h"
-#import "TermDevice.h"
-#import "KBWebViewBase.h"
-#import "openurl.h"
-#import "openssl-compat.h"
-#import <openssl/pkcs7.h>
-#import <openssl/objects.h>
-#import <openssl/x509.h>
-#import <openssl/crypto.h>
-#import <openssl/ssl.h>
-
-#endif /* Blink_bridge_h */
+extension SKProduct {
+    fileprivate static var formatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        return formatter
+    }
+    
+    var localizedPrice: String {
+        if self.price == 0.00 {
+            return "Get"
+        } else {
+            let formatter = SKProduct.formatter
+            formatter.locale = self.priceLocale
+            
+            guard let formattedPrice = formatter.string(from: self.price) else {
+                return "Unknown Price"
+            }
+            
+            return formattedPrice
+        }
+    }
+}

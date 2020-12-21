@@ -55,4 +55,11 @@ import UIKit
       nav: nav
     )
   }
+  
+  @objc static func createSubscriptionWithNav(nav: UINavigationController?) -> UIViewController {
+    _createWith(
+      view: SubscriptionsManagementView(),
+      nav: nav
+    )
+  }
 }

@@ -40,6 +40,7 @@
 #include <libssh/callbacks.h>
 #include "xcall.h"
 #include "Blink-Swift.h"
+#include <StoreKit/StoreKit.h>
 
 
 @import CloudKit;
@@ -82,6 +83,14 @@ void __setupProcessEnv() {
   dispatch_async(bgQueue, ^{
     [BlinkPaths linkICloudDriveIfNeeded];
   });
+  
+  
+  StoreKitHelper * a = [[StoreKitHelper alloc] init];
+  [a fetchWithCompletion:^(NSURL *url){
+    
+    [a parseWithUrl:url];
+    
+  }];
 
   sideLoading = false; // Turn off extra commands from iOS system
   initializeEnvironment(); // initialize environment variables for iOS system
